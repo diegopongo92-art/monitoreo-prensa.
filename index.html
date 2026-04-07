@@ -6,7 +6,11 @@
     <title>Dashboard MML - Monitoreo de Medios</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -138,7 +142,7 @@
             position: relative; display: flex; flex-direction: column;
             box-shadow: var(--shadow-md);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            min-height: 0; /* CORRECCIÓN APLICADA AQUÍ */
+            min-height: 0;
         }
         .chart-card:hover { 
             box-shadow: var(--shadow-hover);
@@ -163,7 +167,7 @@
         .box-top-neg { grid-area: top-neg; }
 
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 16px;}
-        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: calc(50% - 8px) calc(50% - 8px); gap: 16px;} /* CORRECCIÓN APLICADA AQUÍ */
+        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: calc(50% - 8px) calc(50% - 8px); gap: 16px;}
 
         /* ESTILOS DE LOS KPI */
         .kpi-box { 
