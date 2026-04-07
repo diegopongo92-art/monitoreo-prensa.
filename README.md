@@ -3,128 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Monitoreo - Prensa</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>Dashboard de Monitoreo - Lima</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-50 p-4 md:p-8">
-    <div id="app" class="max-w-6xl mx-auto">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-slate-800">📊 Monitoreo de Medios</h1>
-            <p class="text-slate-500">Datos en tiempo real desde Google Sheets</p>
-        </header>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-sm font-medium text-slate-500">Menciones Mes Actual</p>
-                <div class="flex items-baseline gap-4">
-                    <h2 class="text-4xl font-bold text-slate-900">{{ stats.currentMonth }}</h2>
-                    <span :class="stats.diff >= 0 ? 'text-green-600' : 'text-red-600'" class="text-sm font-semibold">
-                        {{ stats.diff >= 0 ? '↑' : '↓' }} {{ Math.abs(stats.percentage).toFixed(1) }}%
-                    </span>
-                </div>
-                <p class="text-xs text-slate-400 mt-2">vs. mes anterior ({{ stats.lastMonth }} menciones)</p>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+                    Panel de Monitoreo de Medios
+                </h1>
+                <p class="text-gray-400 mt-1">Sincronizado con Google Sheets</p>
+            </div>
+            <div id="status" class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20 flex items-center gap-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                En vivo
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-            <h3 class="text-lg font-semibold mb-4 text-slate-700">Línea de Tiempo (Menciones Diarias)</h3>
-            <canvas id="timeChart" height="100"></canvas>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
+                <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Menciones este mes</p>
+                <div class="flex items-end justify-between mt-2">
+                    <h2 id="total-mes" class="text-5xl font-bold italic tracking-tighter">--</h2>
+                    <div id="comparativo-container" class="mb-1">
+                        <span id="comparativo-val" class="px-2 py-1 rounded text-sm font-bold tracking-tight">--</span>
+                    </div>
+                </div>
+                <p class="text-gray-500 text-xs mt-4 italic">vs. mes anterior: <span id="total-pasado">--</span></p>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
+                <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Sentimiento Hoy</p>
+                <div class="mt-2 flex items-center gap-4">
+                    <div id="emoji-sentimiento" class="text-5xl italic font-black">--</div>
+                    <div>
+                        <h2 id="status-texto" class="text-xl font-bold">Analizando...</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl overflow-hidden relative">
+                <div class="relative z-10">
+                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Casos de Urgencia "ALTA"</p>
+                    <h2 id="urgencia-total" class="text-5xl font-bold mt-2">--</h2>
+                </div>
+                <div class="absolute right-0 bottom-0 opacity-10">
+                    <i data-lucide="alert-triangle" class="w-24 h-24 text-red-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-8 rounded-3xl border border-gray-700 shadow-2xl">
+            <h3 class="text-lg font-semibold mb-6 flex items-center gap-2 italic">
+                <i data-lucide="trending-up" class="w-5 h-5 text-blue-400"></i>
+                Línea de Tiempo: Menciones Diarias
+            </h3>
+            <div class="h-[400px]">
+                <canvas id="mencionesChart"></canvas>
+            </div>
         </div>
     </div>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
 
-        const { createApp } = Vue;
-
-        createApp({
-            data() {
-                return {
-                    stats: { currentMonth: 0, lastMonth: 0, diff: 0, percentage: 0 }
+        async function init() {
+            lucide.createIcons();
+            
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    processData(results.data);
                 }
-            },
-            mounted() {
-                this.fetchData();
-            },
-            methods: {
-                fetchData() {
-                    Papa.parse(CSV_URL, {
-                        download: true,
-                        header: true,
-                        complete: (results) => {
-                            this.processData(results.data);
-                        }
-                    });
+            });
+        }
+
+        function processData(data) {
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            let countMesActual = 0;
+            let countMesPasado = 0;
+            let urgenciaAlta = 0;
+            let timeline = {};
+
+            data.forEach(row => {
+                const fechaStr = row['FECHA DE PUBLICACIÓN'];
+                if(!fechaStr) return;
+
+                // Parseo de fecha DD/MM/YYYY
+                const parts = fechaStr.split('/');
+                const date = new Date(parts[2], parts[1] - 1, parts[0]);
+                
+                if(isNaN(date.getTime())) return;
+
+                const rowMonth = date.getMonth();
+                const rowYear = date.getFullYear();
+
+                // Conteo mensual
+                if(rowMonth === currentMonth && rowYear === currentYear) countMesActual++;
+                if(rowMonth === (currentMonth - 1 === -1 ? 11 : currentMonth - 1)) {
+                   if(rowYear === (currentMonth === 0 ? currentYear - 1 : currentYear)) countMesPasado++;
+                }
+
+                // Urgencia
+                if(row['URGENCIA'] === 'ALTA') urgenciaAlta++;
+
+                // Agrupar para gráfico
+                const key = date.toISOString().split('T')[0];
+                timeline[key] = (timeline[key] || 0) + 1;
+            });
+
+            // Actualizar UI
+            document.getElementById('total-mes').innerText = countMesActual;
+            document.getElementById('total-pasado').innerText = countMesPasado;
+            document.getElementById('urgencia-total').innerText = urgenciaAlta;
+
+            // Comparativo
+            const diff = countMesActual - countMesPasado;
+            const perc = countMesPasado > 0 ? (diff / countMesPasado * 100).toFixed(1) : 100;
+            const compEl = document.getElementById('comparativo-val');
+            compEl.innerText = `${diff >= 0 ? '+' : ''}${perc}%`;
+            compEl.className = diff >= 0 ? 'bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-sm font-bold' : 'bg-red-500/20 text-red-400 px-2 py-1 rounded text-sm font-bold';
+
+            renderChart(timeline);
+        }
+
+        function renderChart(timelineData) {
+            const labels = Object.keys(timelineData).sort();
+            const values = labels.map(l => timelineData[l]);
+
+            const ctx = document.getElementById('mencionesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Menciones Diarias',
+                        data: values,
+                        borderColor: '#60a5fa',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#60a5fa',
+                        pointRadius: 4,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)'
+                    }]
                 },
-                processData(data) {
-                    const now = new Date();
-                    const currentMonth = now.getMonth();
-                    const currentYear = now.getFullYear();
-                    
-                    const dailyCounts = {};
-                    let countThisMonth = 0;
-                    let countLastMonth = 0;
-
-                    data.forEach(row => {
-                        // Ajustar según el nombre de tu columna de fecha
-                        const dateStr = row['FECHA DE PUBLICACIÓN'];
-                        if (!dateStr) return;
-
-                        // Formato esperado: DD/MM/YYYY
-                        const parts = dateStr.split('/');
-                        const date = new Date(parts[2], parts[1] - 1, parts[0]);
-                        
-                        if (isNaN(date)) return;
-
-                        // Agrupar para el gráfico
-                        const dayKey = date.toISOString().split('T')[0];
-                        dailyCounts[dayKey] = (dailyCounts[dayKey] || 0) + 1;
-
-                        // Lógica de comparación mensual
-                        if (date.getFullYear() === currentYear && date.getMonth() === currentMonth) {
-                            countThisMonth++;
-                        } else if (date.getFullYear() === currentYear && date.getMonth() === currentMonth - 1) {
-                            countLastMonth++;
-                        }
-                    });
-
-                    // Actualizar KPIs
-                    this.stats.currentMonth = countThisMonth;
-                    this.stats.lastMonth = countLastMonth;
-                    this.stats.diff = countThisMonth - countLastMonth;
-                    this.stats.percentage = countLastMonth ? (this.stats.diff / countLastMonth) * 100 : 0;
-
-                    this.renderChart(dailyCounts);
-                },
-                renderChart(dailyData) {
-                    const sortedLabels = Object.keys(dailyData).sort();
-                    const values = sortedLabels.map(label => dailyData[label]);
-
-                    new Chart(document.getElementById('timeChart'), {
-                        type: 'line',
-                        data: {
-                            labels: sortedLabels,
-                            datasets: [{
-                                label: 'Menciones',
-                                data: values,
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                fill: true,
-                                tension: 0.3
-                            }]
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
                         },
-                        options: {
-                            responsive: true,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { beginAtZero: true } }
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
                         }
-                    });
+                    }
                 }
-            }
-        }).mount('#app');
+            });
+        }
+
+        init();
     </script>
 </body>
 </html>
