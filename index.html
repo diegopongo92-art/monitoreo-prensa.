@@ -13,16 +13,16 @@
     <style>
         /* TEMA MODERNO - BLANCO Y AZUL INSTITUCIONAL */
         :root {
-            --bg-color: #f1f5f9; /* Fondo un poco más gris/azulado para contraste moderno */
+            --bg-color: #f1f5f9; 
             --card-bg: #ffffff;
             --primary: #002f80;
             --primary-light: #2563eb;
             --text-dark: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --pos: #10b981; /* Verde más moderno */
-            --neu: #f59e0b; /* Ambar */
-            --neg: #ef4444; /* Rojo vibrante */
+            --pos: #10b981; 
+            --neu: #f59e0b; 
+            --neg: #ef4444; 
             --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             --radius: 12px;
@@ -78,13 +78,13 @@
         .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PAGINA 1: Vista General (Grid 2x2) */
+        /* PAGINA 1: Vista General (Grid 3 columnas, incluye KPI total) */
         #view-general {
-            grid-template-columns: 60% calc(40% - 12px);
-            grid-template-rows: 45% calc(55% - 12px);
+            grid-template-columns: 220px 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
             grid-template-areas: 
-                "time pie"
-                "temat orig";
+                "kpi time pie"
+                "kpi temat orig";
         }
 
         /* PAGINA 2: Semáforo (Grid 3 columnas) */
@@ -118,6 +118,7 @@
         canvas { width: 100% !important; height: 100% !important; }
 
         /* ASIGNACIÓN DE ÁREAS */
+        .box-kpi-g { grid-area: kpi; display: flex; flex-direction: column;}
         .box-time { grid-area: time; } .box-orig { grid-area: orig; }
         .box-temat { grid-area: temat; } .box-pie { grid-area: pie; }
         
@@ -128,16 +129,16 @@
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 12px;}
         .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 12px;}
 
-        /* AHORRO KPI NUMBERS */
-        .ahorro-total { 
+        /* ESTILOS DE LOS KPI (Total y Ahorro) */
+        .kpi-box { 
             text-align: center; color: white; padding: 25px; border-radius: var(--radius); flex: 1; 
             display:flex; flex-direction:column; justify-content:center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             box-shadow: var(--shadow-md);
         }
-        .ahorro-total h4 { margin: 0 0 10px 0; font-size: 14px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
-        .ahorro-total h2 { margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
-        .ahorro-sub { font-size: 11px; margin-top: 10px; opacity: 0.8; font-weight: 500; }
+        .kpi-box h4 { margin: 0 0 10px 0; font-size: 14px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
+        .kpi-box h2 { margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .kpi-sub { font-size: 11px; margin-top: 10px; opacity: 0.8; font-weight: 500; }
 
         /* LOADING SPINNER */
         #loading { 
@@ -168,6 +169,14 @@
     </header>
 
     <div id="view-general" class="dashboard-view active">
+        <div class="box-kpi-g">
+            <div class="kpi-box">
+                <h4>TOTAL MENCIONES</h4>
+                <h2 id="total-menciones">0</h2>
+                <span class="kpi-sub">En el periodo seleccionado</span>
+            </div>
+        </div>
+
         <div class="chart-card box-time">
             <h3>Menciones en el tiempo</h3>
             <div class="chart-container"><canvas id="c-time"></canvas></div>
@@ -211,10 +220,10 @@
 
     <div id="view-ahorro" class="dashboard-view">
         <div class="box-kpi-a">
-            <div class="ahorro-total">
+            <div class="kpi-box">
                 <h4>AHORRO PUBLICITARIO</h4>
                 <h2 id="total-soles">S/ 0.00</h2>
-                <span class="ahorro-sub">*(Calculado solo en menciones positivas)</span>
+                <span class="kpi-sub">*(Calculado solo en menciones POSITIVAS)</span>
             </div>
         </div>
         <div class="box-bars-a">
@@ -252,9 +261,37 @@
             }
         });
 
+        // Búsqueda de columna más estricta y segura
         function getCol(row, keyword) {
-            const key = Object.keys(row).find(k => k.toUpperCase().includes(keyword.toUpperCase()));
+            const keys = Object.keys(row);
+            // Primero buscar coincidencia exacta
+            let key = keys.find(k => k.trim().toUpperCase() === keyword.trim().toUpperCase());
+            // Si no, buscar parcial
+            if (!key) key = keys.find(k => k.toUpperCase().includes(keyword.toUpperCase()));
             return key ? row[key] : null;
+        }
+
+        // Lector seguro de moneda (soporta formatos "1,200.50" y "1.200,50")
+        function parseCurrency(val) {
+            if(!val) return 0;
+            let str = val.toString().trim();
+            // Quitar símbolos de moneda y letras, dejando números, comas, puntos y guiones
+            str = str.replace(/[^0-9.,-]/g, '');
+            if(str === '') return 0;
+            
+            const lastComma = str.lastIndexOf(',');
+            const lastDot = str.lastIndexOf('.');
+            
+            // Si la coma está después del punto, es formato Latino/Europeo (1.234,50)
+            if (lastComma > lastDot) {
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else {
+                // Formato Americano (1,234.50) o número simple sin miles (1234.50)
+                str = str.replace(/,/g, '');
+            }
+            
+            const num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
         }
 
         function setDefaultDates() {
@@ -289,6 +326,10 @@
         function renderAll() {
             Object.values(charts).forEach(c => c.destroy());
             charts = {};
+            
+            // Actualizar KPI de total de menciones en la Página 1
+            document.getElementById('total-menciones').innerText = filteredData.length.toLocaleString('es-PE');
+
             renderPagina1();
             renderPagina2();
             renderPagina3();
@@ -338,7 +379,7 @@
         // PÁGINA 1: GENERAL
         // ==========================================
         function renderPagina1() {
-            // 1. Tiempo (con etiquetas y formato amigable)
+            // 1. Tiempo
             const timeObj = {};
             filteredData.forEach(r => { const f = getCol(r, 'FECHA'); if(f) timeObj[f] = (timeObj[f]||0)+1; });
             const timeKeys = Object.keys(timeObj).sort((a,b) => { const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]); });
@@ -419,7 +460,7 @@
                 }
             });
 
-            // 1. Líneas de Tiempo Semáforo (con formato amigable, sin datalabels para no saturar)
+            // 1. Líneas de Tiempo Semáforo 
             const allDates = [...new Set(filteredData.map(r=>getCol(r,'FECHA')).filter(Boolean))].sort((a,b)=>{const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]);});
             charts.p2Time = new Chart(document.getElementById('c-time-sem'), {
                 type: 'line',
@@ -508,17 +549,20 @@
         }
 
         // ==========================================
-        // PÁGINA 3: AHORRO (Solo Positivas)
+        // PÁGINA 3: AHORRO (Solo Positivas, Columna "Soles")
         // ==========================================
         function renderPagina3() {
             let totalS = 0;
             const ahMed = {}, ahProt = {};
 
             filteredData.forEach(r => {
-                // REGLA: Solo calcular ahorro si la mención es Positiva
+                // REGLA: Estrictamente Menciones Positivas
                 if(determineSentiment(getCol(r, 'CRITERIO')) === 'Positiva') {
-                    const sVal = parseFloat((getCol(r, 'Soles')||'0').toString().replace(/[^0-9.-]+/g,""));
-                    if(!isNaN(sVal)) {
+                    // Extraer valor explícitamente de la columna 'SOLES' usando parseCurrency
+                    const rawVal = getCol(r, 'SOLES');
+                    const sVal = parseCurrency(rawVal);
+                    
+                    if(sVal > 0) {
                         totalS += sVal;
                         const tm = getCol(r, 'TIPO DE MEDIO') || 'Otros';
                         const tp = getCol(r, 'QUIÉN') || 'Otros';
