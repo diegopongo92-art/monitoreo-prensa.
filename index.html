@@ -6,26 +6,29 @@
     <title>Dashboard MML - Monitoreo de Medios</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     
     <style>
-        /* TEMA MODERNO - BLANCO Y AZUL INSTITUCIONAL */
+        /* TEMA MODERNO - PREMIUM UI */
         :root {
-            --bg-color: #f1f5f9; 
+            --bg-color: #f8fafc; /* Fondo un poco más claro y limpio */
             --card-bg: #ffffff;
             --primary: #002f80;
             --primary-light: #2563eb;
             --text-dark: #0f172a;
-            --text-muted: #475569;
+            --text-muted: #64748b; /* Gris más suave para títulos */
             --border: #e2e8f0;
             --pos: #10b981; 
             --neu: #f59e0b; 
             --neg: #ef4444; 
-            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --radius: 12px;
+            /* Sombras Flat 2.0 */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 10px 25px -5px rgba(0, 47, 128, 0.08);
+            --radius: 16px; /* Bordes más redondeados y amigables */
         }
 
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -40,35 +43,38 @@
         /* HEADER Y FILTROS */
         header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 15px; margin-bottom: 12px;
+            padding: 12px 20px; margin-bottom: 12px;
             background: var(--card-bg); border-radius: var(--radius); 
+            border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
-        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; }
+        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
         .header-left p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
         
-        .nav-buttons { display: flex; gap: 8px; background: var(--bg-color); padding: 4px; border-radius: 8px; }
+        .nav-buttons { display: flex; gap: 8px; background: var(--bg-color); padding: 5px; border-radius: 10px; border: 1px solid var(--border); }
         .nav-btn {
             background: transparent; border: none; color: var(--text-muted);
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
             transition: all 0.2s ease;
         }
-        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 800;}
-        .nav-btn:hover:not(.active) { color: var(--text-dark); }
+        .nav-btn i { font-size: 16px; }
+        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 700;}
+        .nav-btn:hover:not(.active) { color: var(--text-dark); background: rgba(0,0,0,0.02); }
         
         .filters { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
         
-        /* NUEVO ESTILO PARA EL SELECTOR DE MES */
         select {
-            padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; 
+            padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; 
             font-size: 13px; color: var(--text-dark); font-weight: 600; outline: none;
             background-color: white; cursor: pointer; transition: border-color 0.2s;
         }
         select:focus { border-color: var(--primary-light); }
         
         .btn-apply { 
-            background: var(--primary); color: white; border: none; padding: 7px 14px; 
-            border-radius: 6px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
+            background: var(--primary); color: white; border: none; padding: 8px 16px; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
             transition: background 0.2s, transform 0.1s; 
         }
         .btn-apply:hover { background: var(--primary-light); transform: translateY(-1px); }
@@ -76,15 +82,15 @@
         /* VISTAS Y GRIDS */
         .dashboard-view { 
             display: none; flex: 1; height: calc(100vh - 85px); 
-            gap: 12px; padding-bottom: 5px;
+            gap: 16px; padding-bottom: 5px;
         }
         .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* PAGINA 1: Vista General */
         #view-general {
             grid-template-columns: repeat(12, 1fr);
-            grid-template-rows: 38% calc(62% - 12px);
+            grid-template-rows: 38% calc(62% - 16px);
             grid-template-areas: 
                 "kpi kpi time time time time time time time pie pie pie"
                 "prot prot prot prot temat temat temat temat orig orig orig orig";
@@ -93,7 +99,7 @@
         /* PAGINA 2: Semáforo */
         #view-semaforo {
             grid-template-columns: repeat(12, 1fr);
-            grid-template-rows: 45% calc(55% - 12px);
+            grid-template-rows: 45% calc(55% - 16px);
             grid-template-areas: 
                 "time-s time-s time-s time-s time-s time-s time-s time-s pie-s pie-s pie-s pie-s"
                 "top-neg top-neg top-neg top-neg prot-s prot-s prot-s prot-s med-s med-s med-s med-s";
@@ -101,21 +107,29 @@
 
         /* PAGINA 3: Ahorro */
         #view-ahorro {
-            grid-template-columns: 25% calc(75% - 12px);
+            grid-template-columns: 25% calc(75% - 16px);
             grid-template-rows: 100%;
             grid-template-areas: "kpi bars";
         }
 
-        /* TARJETAS DE GRÁFICOS */
+        /* TARJETAS DE GRÁFICOS - ESTILO PREMIUM */
         .chart-card {
-            background: var(--card-bg); border-radius: var(--radius); 
-            padding: 12px 15px; position: relative; display: flex; flex-direction: column;
-            box-shadow: var(--shadow-sm); transition: box-shadow 0.2s;
+            background: var(--card-bg); 
+            border-radius: var(--radius); 
+            border: 1px solid var(--border);
+            padding: 16px 20px; 
+            position: relative; display: flex; flex-direction: column;
+            box-shadow: var(--shadow-md); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .chart-card:hover { box-shadow: var(--shadow-md); }
+        .chart-card:hover { 
+            box-shadow: var(--shadow-hover); 
+            transform: translateY(-2px); 
+        }
         .chart-card h3 { 
-            margin: 0 0 10px 0; font-size: 14px; color: var(--text-dark); 
-            font-weight: 800; text-transform: uppercase; letter-spacing: -0.3px;
+            margin: 0 0 12px 0; font-size: 13px; color: var(--text-muted); 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 6px;
         }
         .chart-container { flex: 1; position: relative; min-height: 0; }
         canvas { width: 100% !important; height: 100% !important; }
@@ -129,8 +143,8 @@
         .box-prot-s { grid-area: prot-s; } .box-med-s { grid-area: med-s; }
         .box-top-neg { grid-area: top-neg; }
 
-        .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 12px;}
-        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 12px;}
+        .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 16px;}
+        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 16px;}
 
         /* ESTILOS DE LOS KPI */
         .kpi-box { 
@@ -138,44 +152,58 @@
             display:flex; flex-direction:column; justify-content:center; align-items: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             box-shadow: var(--shadow-md);
+            position: relative; overflow: hidden; /* Para la marca de agua */
         }
-        .kpi-box h4 { margin: 0 0 8px 0; font-size: 14px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
-        .kpi-box h2 { margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .kpi-bg-icon {
+            position: absolute; right: -20px; bottom: -20px;
+            font-size: 140px; opacity: 0.08; color: #fff;
+            pointer-events: none;
+        }
+        .kpi-box h4 { margin: 0 0 8px 0; font-size: 13px; font-weight: 600; opacity: 0.9; letter-spacing: 1px; z-index: 1;}
+        .kpi-box h2 { margin: 0; font-size: 46px; font-weight: 900; letter-spacing: -1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;}
         
         .trend-badge {
-            margin-top: 10px; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
-            display: inline-flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-top: 12px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;
         }
         .trend-badge.up { background-color: #dcfce7; color: #166534; }
         .trend-badge.down { background-color: #fee2e2; color: #991b1b; }
-        .trend-badge.flat { background-color: #f1f5f9; color: #475569; }
-        .kpi-sub { font-size: 12px; margin-top: 8px; opacity: 0.8; font-weight: 500; }
+        .trend-badge.flat { background-color: rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(4px);}
+        .kpi-sub { font-size: 12px; margin-top: 8px; opacity: 0.8; font-weight: 500; z-index: 1;}
 
         /* LOADING SPINNER */
         #loading { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-            background: rgba(255, 255, 255, 0.8); z-index: 999; display: flex; align-items: center; justify-content: center; 
-            color: var(--primary); font-weight: 800; font-size: 20px; backdrop-filter: blur(4px);
+            background: rgba(248, 250, 252, 0.9); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            color: var(--primary); font-weight: 800; font-size: 18px; backdrop-filter: blur(8px); gap: 15px;
         }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); 
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="loading">Sincronizando con Google Sheets...</div>
+    <div id="loading">
+        <div class="spinner"></div>
+        Sincronizando con la base de datos...
+    </div>
 
     <header>
         <div class="header-left">
-            <h1>Panel de Monitoreo</h1>
+            <h1><i class="ph-fill ph-chart-line-up"></i> Panel de Monitoreo</h1>
             <p>MUNICIPALIDAD METROPOLITANA DE LIMA</p>
         </div>
         <div class="nav-buttons">
-            <button class="nav-btn active" onclick="switchView('general')">1. Vista General</button>
-            <button class="nav-btn" onclick="switchView('semaforo')">2. Semáforo</button>
-            <button class="nav-btn" onclick="switchView('ahorro')">3. Ahorro</button>
+            <button class="nav-btn active" onclick="switchView('general')"><i class="ph ph-squares-four"></i> General</button>
+            <button class="nav-btn" onclick="switchView('semaforo')"><i class="ph ph-traffic-signal"></i> Semáforo</button>
+            <button class="nav-btn" onclick="switchView('ahorro')"><i class="ph ph-piggy-bank"></i> Ahorro</button>
         </div>
         
         <div class="filters">
-            <label for="month-select" style="color: var(--text-muted);">Mes (Actual):</label>
+            <label for="month-select" style="color: var(--text-muted);"><i class="ph ph-calendar-blank"></i> Mes:</label>
             <select id="month-select">
                 <option value="0">Enero</option>
                 <option value="1">Febrero</option>
@@ -190,13 +218,14 @@
                 <option value="10">Noviembre</option>
                 <option value="11">Diciembre</option>
             </select>
-            <button class="btn-apply" onclick="applyFilter()">Filtrar</button>
+            <button class="btn-apply" onclick="applyFilter()"><i class="ph ph-funnel"></i> Filtrar</button>
         </div>
     </header>
 
     <div id="view-general" class="dashboard-view active">
         <div class="box-kpi-g">
             <div class="kpi-box">
+                <i class="ph-fill ph-megaphone kpi-bg-icon"></i>
                 <h4>TOTAL MENCIONES</h4>
                 <h2 id="total-menciones">0</h2>
                 <div id="kpi-trend" class="trend-badge flat">--</div>
@@ -204,47 +233,47 @@
         </div>
 
         <div class="chart-card box-time">
-            <h3>Menciones en el tiempo</h3>
+            <h3><i class="ph ph-trend-up"></i> Menciones en el tiempo</h3>
             <div class="chart-container"><canvas id="c-time"></canvas></div>
         </div>
         <div class="chart-card box-pie">
-            <h3>Tipo de Medio (%)</h3>
+            <h3><i class="ph ph-pie-chart"></i> Tipo de Medio (%)</h3>
             <div class="chart-container"><canvas id="c-medio"></canvas></div>
         </div>
         
         <div class="chart-card box-prot">
-            <h3>Top Protagonistas</h3>
+            <h3><i class="ph ph-users"></i> Top Protagonistas</h3>
             <div class="chart-container"><canvas id="c-prot"></canvas></div>
         </div>
         <div class="chart-card box-temat">
-            <h3>Temática (Top 10)</h3>
+            <h3><i class="ph ph-hash"></i> Temática (Top 10)</h3>
             <div class="chart-container"><canvas id="c-temat"></canvas></div>
         </div>
         <div class="chart-card box-orig">
-            <h3>Origen de Posicionamiento</h3>
+            <h3><i class="ph ph-map-pin"></i> Origen de Posicionamiento</h3>
             <div class="chart-container"><canvas id="c-orig"></canvas></div>
         </div>
     </div>
 
     <div id="view-semaforo" class="dashboard-view">
         <div class="chart-card box-time-s">
-            <h3>Menciones por Sentimiento</h3>
+            <h3><i class="ph ph-activity"></i> Menciones por Sentimiento</h3>
             <div class="chart-container"><canvas id="c-time-sem"></canvas></div>
         </div>
         <div class="chart-card box-pie-s">
-            <h3>Proporción de Sentimientos</h3>
+            <h3><i class="ph ph-chart-polar"></i> Proporción de Sentimientos</h3>
             <div class="chart-container"><canvas id="c-pie-sem"></canvas></div>
         </div>
         <div class="chart-card box-top-neg">
-            <h3>Top Medios más Negativos</h3>
+            <h3><i class="ph ph-warning-circle"></i> Top Medios más Negativos</h3>
             <div class="chart-container"><canvas id="c-top-neg"></canvas></div>
         </div>
         <div class="chart-card box-prot-s">
-            <h3>Sentimiento por Protagonista</h3>
+            <h3><i class="ph ph-user-focus"></i> Sentimiento por Protagonista</h3>
             <div class="chart-container"><canvas id="c-prot-sem"></canvas></div>
         </div>
         <div class="chart-card box-med-s">
-            <h3>Sentimiento por Tipo Medio</h3>
+            <h3><i class="ph ph-broadcast"></i> Sentimiento por Tipo Medio</h3>
             <div class="chart-container"><canvas id="c-med-sem"></canvas></div>
         </div>
     </div>
@@ -252,6 +281,7 @@
     <div id="view-ahorro" class="dashboard-view">
         <div class="box-kpi-a">
             <div class="kpi-box">
+                <i class="ph-fill ph-wallet kpi-bg-icon"></i>
                 <h4>AHORRO PUBLICITARIO</h4>
                 <h2 id="total-soles">S/ 0.00</h2>
                 <span class="kpi-sub">*(Solo Menciones Positivas)</span>
@@ -259,20 +289,19 @@
         </div>
         <div class="box-bars-a">
             <div class="chart-card">
-                <h3>Ahorro Publicitario por Tipo de Medio</h3>
+                <h3><i class="ph ph-buildings"></i> Ahorro por Tipo de Medio</h3>
                 <div class="chart-container"><canvas id="c-ahorro-med"></canvas></div>
             </div>
             <div class="chart-card">
-                <h3>Ahorro Publicitario por Protagonista</h3>
+                <h3><i class="ph ph-user"></i> Ahorro por Protagonista</h3>
                 <div class="chart-container"><canvas id="c-ahorro-prot"></canvas></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Registrar plugin DataLabels y CONFIGURACIÓN GLOBAL DE TAMAÑOS
         Chart.register(ChartDataLabels);
-        Chart.defaults.color = '#475569';
+        Chart.defaults.color = '#64748b';
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.font.size = 13; 
 
@@ -286,9 +315,10 @@
             download: true, header: true,
             complete: function(results) {
                 rawData = results.data;
-                setDefaultMonth(); // Cambiado a selector de mes
+                setDefaultMonth();
                 applyFilter();
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading').style.display = 'none', 300);
             }
         });
 
@@ -312,7 +342,6 @@
             return isNaN(num) ? 0 : num;
         }
 
-        // NUEVA FUNCIÓN PARA SELECCIONAR MES ACTUAL POR DEFECTO
         function setDefaultMonth() {
             const today = new Date();
             document.getElementById('month-select').value = today.getMonth();
@@ -325,16 +354,13 @@
             document.getElementById('view-' + viewId).classList.add('active');
         }
 
-        // NUEVA LÓGICA DE FILTRADO POR MES
         function applyFilter() {
             const selectedMonth = parseInt(document.getElementById('month-select').value);
-            const currentYear = new Date().getFullYear(); // Usa el año en curso
+            const currentYear = new Date().getFullYear();
             
-            // Rango del mes seleccionado
             const start = new Date(currentYear, selectedMonth, 1);
-            const end = new Date(currentYear, selectedMonth + 1, 0, 23, 59, 59); // Último día del mes
+            const end = new Date(currentYear, selectedMonth + 1, 0, 23, 59, 59);
             
-            // Rango del mes anterior (para el KPI)
             const prevStart = new Date(currentYear, selectedMonth - 1, 1);
             const prevEnd = new Date(currentYear, selectedMonth, 0, 23, 59, 59);
             
@@ -369,18 +395,18 @@
             
             const trendEl = document.getElementById('kpi-trend');
             if(prevCount === 0) {
-                trendEl.innerHTML = '= 0% vs mes ant.';
+                trendEl.innerHTML = '<i class="ph ph-minus"></i> 0% vs mes ant.';
                 trendEl.className = 'trend-badge flat';
             } else {
                 const diff = ((currCount - prevCount) / prevCount) * 100;
                 if(diff > 0) {
-                    trendEl.innerHTML = `▲ ${diff.toFixed(1)}% vs mes ant.`;
+                    trendEl.innerHTML = `<i class="ph-bold ph-trend-up"></i> ${diff.toFixed(1)}% vs mes ant.`;
                     trendEl.className = 'trend-badge up';
                 } else if(diff < 0) {
-                    trendEl.innerHTML = `▼ ${Math.abs(diff).toFixed(1)}% vs mes ant.`;
+                    trendEl.innerHTML = `<i class="ph-bold ph-trend-down"></i> ${Math.abs(diff).toFixed(1)}% vs mes ant.`;
                     trendEl.className = 'trend-badge down';
                 } else {
-                    trendEl.innerHTML = `= 0% vs mes ant.`;
+                    trendEl.innerHTML = `<i class="ph ph-minus"></i> 0% vs mes ant.`;
                     trendEl.className = 'trend-badge flat';
                 }
             }
@@ -398,7 +424,7 @@
         }
 
         const datalabelsConfig = {
-            color: varCol => varCol || colors.main, font: { weight: '800', size: 13 },
+            color: varCol => varCol || colors.main, font: { weight: '700', size: 12 },
             anchor: 'end', align: 'end',
             formatter: (val, ctx) => {
                 if(!val) return '';
@@ -407,18 +433,19 @@
             }
         };
         const pieLabelsConfig = {
-            color: '#fff', font: { weight: 'bold', size: 14 },
-            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.6)',
+            color: '#fff', font: { weight: 'bold', size: 13 },
+            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.4)',
             formatter: (val, ctx) => {
                 const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                 return `${val}\n(${(val*100/sum).toFixed(1)}%)`;
             }
         };
         const scaleAxesConfig = {
-            ticks: { font: { size: 12, weight: '600' }, color: '#334155' } 
+            ticks: { font: { size: 12, weight: '500' }, color: '#64748b' } 
         };
         const tooltipConfig = {
-            enabled: true, titleFont: { size: 14 }, bodyFont: { size: 13 }, padding: 10
+            enabled: true, titleFont: { size: 14, family:'Inter' }, bodyFont: { size: 13, family:'Inter' }, padding: 12,
+            backgroundColor: 'rgba(15, 23, 42, 0.9)', cornerRadius: 8
         };
 
         function groupData(colName) {
@@ -443,42 +470,48 @@
             filteredData.forEach(r => { const f = getCol(r, 'FECHA'); if(f) timeObj[f] = (timeObj[f]||0)+1; });
             const timeKeys = Object.keys(timeObj).sort((a,b) => { const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]); });
             
+            // Creación del degradado para la gráfica de línea
+            const ctxTime = document.getElementById('c-time').getContext('2d');
+            const gradientTime = ctxTime.createLinearGradient(0, 0, 0, 300);
+            gradientTime.addColorStop(0, colors.mainLight + '60'); // Azul semi-transparente arriba
+            gradientTime.addColorStop(1, colors.mainLight + '00'); // Transparente abajo
+
             charts.p1Time = new Chart(document.getElementById('c-time'), {
                 type: 'line',
-                data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: colors.mainLight+'20', fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: colors.main }] },
+                data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: gradientTime, fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: colors.main, pointBorderWidth: 2 }] },
                 options: { 
                     interaction: { mode: 'index', intersect: false }, 
                     responsive: true, maintainAspectRatio: false, 
-                    plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '800', size: 13 } } }, 
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                    plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '700', size: 12 } } }, 
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
                 }
             });
 
             const med = groupData('TIPO DE MEDIO');
             charts.p1Medio = new Chart(document.getElementById('c-medio'), {
                 type: 'doughnut',
-                data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { tooltip: tooltipConfig, legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:13, family:'Inter'}}}, datalabels: pieLabelsConfig } }
+                data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 2, borderColor: '#fff' }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { tooltip: tooltipConfig, legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:12, family:'Inter'}}}, datalabels: pieLabelsConfig } }
             });
 
             const prot = groupData('QUIÉN').slice(0, 10);
             charts.p1Prot = new Chart(document.getElementById('c-prot'), {
                 type: 'bar',
-                data: { labels: prot.map(x=>x[0]), datasets: [{ data: prot.map(x=>x[1]), backgroundColor: colors.sky, borderRadius: 4 }] },
+                data: { labels: prot.map(x=>x[0]), datasets: [{ data: prot.map(x=>x[1]), backgroundColor: colors.sky, borderRadius: 6 }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.sky} }, layout:{padding:{right:70}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
 
             const temat = groupData('TEMA').slice(0, 10);
             charts.p1Temat = new Chart(document.getElementById('c-temat'), {
                 type: 'bar',
-                data: { labels: temat.map(x=>x[0]), datasets: [{ data: temat.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
+                data: { labels: temat.map(x=>x[0]), datasets: [{ data: temat.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 6 }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.mainLight} }, layout:{padding:{right:70}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
 
             const orig = groupData('ORIGEN').slice(0, 10);
             charts.p1Orig = new Chart(document.getElementById('c-orig'), {
                 type: 'bar',
-                data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 6 }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, layout:{padding:{right:70}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
         }
@@ -517,22 +550,22 @@
                 options: { 
                     interaction: { mode: 'index', intersect: false }, 
                     responsive: true, maintainAspectRatio: false, 
-                    plugins: { tooltip: tooltipConfig, datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:13}}} }, 
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                    plugins: { tooltip: tooltipConfig, datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:12, family:'Inter'}}} }, 
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
                 }
             });
 
             charts.p2Pie = new Chart(document.getElementById('c-pie-sem'), {
                 type: 'pie',
-                data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [sentCount['Positiva'], sentCount['Neutro'], sentCount['Negativa']], backgroundColor: [colors.pos, colors.neu, colors.neg], borderWidth:0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, datalabels: pieLabelsConfig, legend:{position:'bottom', labels:{usePointStyle:true, font:{size:13}}} } }
+                data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [sentCount['Positiva'], sentCount['Neutro'], sentCount['Negativa']], backgroundColor: [colors.pos, colors.neu, colors.neg], borderWidth: 2, borderColor: '#fff' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, datalabels: pieLabelsConfig, legend:{position:'bottom', labels:{usePointStyle:true, font:{size:12, family:'Inter'}}} } }
             });
 
             const topNeg = Object.entries(medNeg).sort((a,b)=>b[1]-a[1]).slice(0,5);
             charts.p2Top = new Chart(document.getElementById('c-top-neg'), {
                 type: 'bar',
-                data: { labels: topNeg.map(x=>x[0]), datasets: [{ data: topNeg.map(x=>x[1]), backgroundColor: colors.neg, borderRadius: 4 }] },
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'800', size:13}}}, scales:{x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{right:40}} }
+                data: { labels: topNeg.map(x=>x[0]), datasets: [{ data: topNeg.map(x=>x[1]), backgroundColor: colors.neg, borderRadius: 6 }] },
+                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'700', size:12}}}, scales:{x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{right:40}} }
             });
 
             function buildStack(colName) {
@@ -547,7 +580,7 @@
                 return { labels:cats, p, nu, ne };
             }
 
-            const stackLabelConf = { color: '#fff', font: { weight: 'bold', size: 13 }, display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; } };
+            const stackLabelConf = { color: '#fff', font: { weight: 'bold', size: 12 }, display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; } };
             const stackLabelConfNeu = { ...stackLabelConf, color: '#000' };
 
             const stProt = buildStack('QUIÉN');
@@ -589,21 +622,21 @@
             document.getElementById('total-soles').innerText = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(totalS);
 
             const moneyLabelConf = {
-                color: colors.main, anchor: 'end', align: 'end', font: {weight:'800', size: 13},
+                color: colors.main, anchor: 'end', align: 'end', font: {weight:'700', size: 12},
                 formatter: (val) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', maximumFractionDigits:0 }).format(val)
             };
 
             const sortAhMed = Object.entries(ahMed).sort((a,b)=>b[1]-a[1]);
             charts.p3Med = new Chart(document.getElementById('c-ahorro-med'), {
                 type: 'bar',
-                data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: moneyLabelConf}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
             });
 
             const sortAhProt = Object.entries(ahProt).sort((a,b)=>b[1]-a[1]);
             charts.p3Prot = new Chart(document.getElementById('c-ahorro-prot'), {
                 type: 'bar',
-                data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
+                data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: {...moneyLabelConf, color: colors.mainLight}}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
             });
         }
