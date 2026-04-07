@@ -4,65 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard MML - Monitoreo de Medios</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     
     <style>
-        /* TEMA BLANCO Y AZUL INSTITUCIONAL */
+        /* TEMA MODERNO - BLANCO Y AZUL INSTITUCIONAL */
         :root {
-            --bg-color: #f8fafc;
+            --bg-color: #f1f5f9; /* Fondo un poco más gris/azulado para contraste moderno */
             --card-bg: #ffffff;
-            --primary: #002f80; /* Azul solicitado */
-            --primary-light: #335999;
-            --text-dark: #1e293b;
+            --primary: #002f80;
+            --primary-light: #2563eb;
+            --text-dark: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --pos: #22c55e;
-            --neu: #f59e0b;
-            --neg: #ef4444;
+            --pos: #10b981; /* Verde más moderno */
+            --neu: #f59e0b; /* Ambar */
+            --neg: #ef4444; /* Rojo vibrante */
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 12px;
         }
 
-        /* DISEÑO COMPACTO PARA EVITAR SCROLL */
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
         body { 
-            margin: 0; padding: 10px; 
+            margin: 0; padding: 12px; 
             background-color: var(--bg-color); color: var(--text-dark);
-            height: 100vh; overflow: hidden; /* Oculta el scroll, fuerza a caber en pantalla */
+            height: 100vh; overflow: hidden; 
             display: flex; flex-direction: column;
         }
 
         /* HEADER Y FILTROS */
         header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 5px 10px; margin-bottom: 10px;
-            background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 10px 15px; margin-bottom: 12px;
+            background: var(--card-bg); border-radius: var(--radius); 
+            box-shadow: var(--shadow-sm);
         }
-        .header-left h1 { margin: 0; font-size: 18px; color: var(--primary); font-weight: 800; text-transform: uppercase; }
-        .header-left p { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: bold; }
+        .header-left h1 { margin: 0; font-size: 18px; color: var(--primary); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; }
+        .header-left p { margin: 2px 0 0 0; font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
         
+        .nav-buttons { display: flex; gap: 8px; background: var(--bg-color); padding: 4px; border-radius: 8px; }
         .nav-btn {
-            background: transparent; border: 1px solid var(--border); color: var(--text-muted);
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;
+            transition: all 0.2s ease;
         }
-        .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 800;}
+        .nav-btn:hover:not(.active) { color: var(--text-dark); }
         
-        .filters { display: flex; gap: 8px; align-items: center; font-size: 12px; font-weight: 600;}
-        input[type="date"] { padding: 4px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; color: var(--primary); font-weight: bold; }
-        .btn-apply { background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold;}
+        .filters { display: flex; gap: 10px; align-items: center; font-size: 12px; font-weight: 600;}
+        input[type="date"] { 
+            padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; 
+            font-size: 12px; color: var(--text-dark); font-weight: 600; outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="date"]:focus { border-color: var(--primary-light); }
+        .btn-apply { 
+            background: var(--primary); color: white; border: none; padding: 7px 14px; 
+            border-radius: 6px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm);
+            transition: background 0.2s, transform 0.1s; 
+        }
+        .btn-apply:hover { background: var(--primary-light); transform: translateY(-1px); }
 
         /* VISTAS Y GRIDS */
         .dashboard-view { 
-            display: none; flex: 1; height: calc(100vh - 75px); 
-            gap: 10px; padding-bottom: 5px;
+            display: none; flex: 1; height: calc(100vh - 85px); 
+            gap: 12px; padding-bottom: 5px;
         }
-        .dashboard-view.active { display: grid; }
+        .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* PAGINA 1: Vista General (Grid 2x2) */
         #view-general {
-            grid-template-columns: 60% 40%;
-            grid-template-rows: 45% 55%;
+            grid-template-columns: 60% calc(40% - 12px);
+            grid-template-rows: 45% calc(55% - 12px);
             grid-template-areas: 
                 "time pie"
                 "temat orig";
@@ -71,7 +90,7 @@
         /* PAGINA 2: Semáforo (Grid 3 columnas) */
         #view-semaforo {
             grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 45% 55%;
+            grid-template-rows: 45% calc(55% - 12px);
             grid-template-areas: 
                 "time-s pie-s top-neg"
                 "prot-s med-s med-s";
@@ -79,20 +98,21 @@
 
         /* PAGINA 3: Ahorro */
         #view-ahorro {
-            grid-template-columns: 30% 70%;
+            grid-template-columns: 30% calc(70% - 12px);
             grid-template-rows: 100%;
             grid-template-areas: "kpi bars";
         }
 
         /* TARJETAS DE GRÁFICOS */
         .chart-card {
-            background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border);
-            padding: 10px; position: relative; display: flex; flex-direction: column;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: var(--card-bg); border-radius: var(--radius); 
+            padding: 12px 15px; position: relative; display: flex; flex-direction: column;
+            box-shadow: var(--shadow-sm); transition: box-shadow 0.2s;
         }
+        .chart-card:hover { box-shadow: var(--shadow-md); }
         .chart-card h3 { 
-            margin: 0 0 5px 0; font-size: 12px; color: var(--primary); 
-            font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 3px;
+            margin: 0 0 10px 0; font-size: 13px; color: var(--text-dark); 
+            font-weight: 800; text-transform: uppercase; letter-spacing: -0.3px;
         }
         .chart-container { flex: 1; position: relative; min-height: 0; }
         canvas { width: 100% !important; height: 100% !important; }
@@ -105,15 +125,26 @@
         .box-prot-s { grid-area: prot-s; } .box-med-s { grid-area: med-s; }
         .box-top-neg { grid-area: top-neg; }
 
-        .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 10px;}
-        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 10px;}
+        .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 12px;}
+        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 12px;}
 
         /* AHORRO KPI NUMBERS */
-        .ahorro-total { text-align: center; background: var(--primary); color: white; padding: 20px; border-radius: 8px; flex: 1; display:flex; flex-direction:column; justify-content:center;}
-        .ahorro-total h4 { margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;}
-        .ahorro-total h2 { margin: 0; font-size: 36px; font-weight: 900;}
+        .ahorro-total { 
+            text-align: center; color: white; padding: 25px; border-radius: var(--radius); flex: 1; 
+            display:flex; flex-direction:column; justify-content:center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            box-shadow: var(--shadow-md);
+        }
+        .ahorro-total h4 { margin: 0 0 10px 0; font-size: 14px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
+        .ahorro-total h2 { margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .ahorro-sub { font-size: 11px; margin-top: 10px; opacity: 0.8; font-weight: 500; }
 
-        #loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 999; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: bold; font-size: 20px;}
+        /* LOADING SPINNER */
+        #loading { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(255, 255, 255, 0.8); z-index: 999; display: flex; align-items: center; justify-content: center; 
+            color: var(--primary); font-weight: 800; font-size: 20px; backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 <body>
@@ -146,11 +177,11 @@
             <div class="chart-container"><canvas id="c-medio"></canvas></div>
         </div>
         <div class="chart-card box-temat">
-            <h3>Temática (Número y %)</h3>
+            <h3>Temática (Top 10)</h3>
             <div class="chart-container"><canvas id="c-temat"></canvas></div>
         </div>
         <div class="chart-card box-orig">
-            <h3>Origen de Posicionamiento</h3>
+            <h3>Origen de Posicionamiento (Top 10)</h3>
             <div class="chart-container"><canvas id="c-orig"></canvas></div>
         </div>
     </div>
@@ -181,8 +212,9 @@
     <div id="view-ahorro" class="dashboard-view">
         <div class="box-kpi-a">
             <div class="ahorro-total">
-                <h4>AHORRO PUBLICITARIO TOTAL</h4>
+                <h4>AHORRO PUBLICITARIO</h4>
                 <h2 id="total-soles">S/ 0.00</h2>
+                <span class="ahorro-sub">*(Calculado solo en menciones positivas)</span>
             </div>
         </div>
         <div class="box-bars-a">
@@ -198,12 +230,14 @@
     </div>
 
     <script>
+        // Registrar plugin DataLabels y configurar fuentes por defecto
         Chart.register(ChartDataLabels);
         Chart.defaults.color = '#64748b';
-        Chart.defaults.font.family = 'Segoe UI';
+        Chart.defaults.font.family = "'Inter', sans-serif";
 
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
-        const colors = { main: '#002f80', pos: '#22c55e', neu: '#f59e0b', neg: '#ef4444' };
+        const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb' };
+        const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
         
         let rawData = [], filteredData = [], charts = {};
 
@@ -218,14 +252,12 @@
             }
         });
 
-        // BÚSQUEDA DE COLUMNAS FLEXIBLE (Por si cambias un espacio o tilde en Excel)
         function getCol(row, keyword) {
             const key = Object.keys(row).find(k => k.toUpperCase().includes(keyword.toUpperCase()));
             return key ? row[key] : null;
         }
 
         function setDefaultDates() {
-            // Ponemos el mes actual como defecto
             const today = new Date();
             const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
             document.getElementById('date-start').value = firstDay.toISOString().split('T')[0];
@@ -254,7 +286,6 @@
             renderAll();
         }
 
-        // --- RENDERIZADO PRINCIPAL ---
         function renderAll() {
             Object.values(charts).forEach(c => c.destroy());
             charts = {};
@@ -263,9 +294,16 @@
             renderPagina3();
         }
 
-        // --- CONFIGURACIÓN DE ETIQUETAS NUM + % ---
+        // --- UTILIDADES DE FORMATO ---
+        function formatFriendlyDate(dateStr) {
+            if(!dateStr) return '';
+            const p = dateStr.split('/');
+            if(p.length !== 3) return dateStr;
+            return `${parseInt(p[0], 10)} de ${monthNames[parseInt(p[1], 10)-1]}`;
+        }
+
         const datalabelsConfig = {
-            color: '#002f80', font: { weight: 'bold', size: 10 },
+            color: varCol => varCol || colors.main, font: { weight: '800', size: 10 },
             anchor: 'end', align: 'end',
             formatter: (val, ctx) => {
                 if(!val) return '';
@@ -274,14 +312,14 @@
             }
         };
         const pieLabelsConfig = {
-            color: '#fff', font: { weight: 'bold', size: 10 },
+            color: '#fff', font: { weight: 'bold', size: 11 },
+            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.5)',
             formatter: (val, ctx) => {
                 const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                 return `${val}\n(${(val*100/sum).toFixed(1)}%)`;
             }
         };
 
-        // --- FUNCIONES DE AGRUPACIÓN ---
         function groupData(colName) {
             const res = {};
             filteredData.forEach(r => { const v = getCol(r, colName); if(v) res[v] = (res[v]||0)+1; });
@@ -300,39 +338,64 @@
         // PÁGINA 1: GENERAL
         // ==========================================
         function renderPagina1() {
-            // 1. Tiempo
+            // 1. Tiempo (con etiquetas y formato amigable)
             const timeObj = {};
             filteredData.forEach(r => { const f = getCol(r, 'FECHA'); if(f) timeObj[f] = (timeObj[f]||0)+1; });
-            const timeLabels = Object.keys(timeObj).sort((a,b) => { const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]); });
+            const timeKeys = Object.keys(timeObj).sort((a,b) => { const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]); });
             
             charts.p1Time = new Chart(document.getElementById('c-time'), {
                 type: 'line',
-                data: { labels: timeLabels, datasets: [{ data: timeLabels.map(l=>timeObj[l]), borderColor: colors.main, backgroundColor: colors.main+'20', fill:true, tension:0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels:{display:false} } }
+                data: { 
+                    labels: timeKeys.map(formatFriendlyDate), 
+                    datasets: [{ 
+                        data: timeKeys.map(l=>timeObj[l]), 
+                        borderColor: colors.mainLight, backgroundColor: colors.mainLight+'20', 
+                        fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: colors.main 
+                    }] 
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { 
+                        legend:{display:false}, 
+                        datalabels:{ 
+                            display: true, align: 'top', anchor: 'center', offset: 6,
+                            color: colors.main, font: { weight: '800', size: 10 }
+                        } 
+                    },
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] } }, x: { grid: { display: false } } }
+                }
             });
 
-            // 2. Origen (Barras Horizontales con %)
-            const orig = groupData('ORIGEN');
+            // 2. Origen (Top 10)
+            const orig = groupData('ORIGEN').slice(0, 10);
             charts.p1Orig = new Chart(document.getElementById('c-orig'), {
                 type: 'bar',
-                data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels: datalabelsConfig }, layout:{padding:{right:50}}, scales: { x:{display:false} } }
+                data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                options: { 
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, 
+                    layout:{padding:{right:60}}, scales: { x:{display:false}, y:{grid:{display:false}} } 
+                }
             });
 
-            // 3. Temática (Barras Horizontales con %)
-            const temat = groupData('TEMA');
+            // 3. Temática (Top 10)
+            const temat = groupData('TEMA').slice(0, 10);
             charts.p1Temat = new Chart(document.getElementById('c-temat'), {
                 type: 'bar',
-                data: { labels: temat.map(x=>x[0]), datasets: [{ data: temat.map(x=>x[1]), backgroundColor: '#3b82f6' }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels: datalabelsConfig }, layout:{padding:{right:50}}, scales: { x:{display:false} } }
+                data: { labels: temat.map(x=>x[0]), datasets: [{ data: temat.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
+                options: { 
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.mainLight} }, 
+                    layout:{padding:{right:60}}, scales: { x:{display:false}, y:{grid:{display:false}} } 
+                }
             });
 
-            // 4. Tipo Medio (Doughnut)
+            // 4. Tipo Medio
             const med = groupData('TIPO DE MEDIO');
             charts.p1Medio = new Chart(document.getElementById('c-medio'), {
                 type: 'doughnut',
-                data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, '#3b82f6', '#93c5fd', '#1e3a8a'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend:{position:'right', labels:{boxWidth:10, font:{size:10}}}, datalabels: pieLabelsConfig } }
+                data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:11, family:'Inter'}}}, datalabels: pieLabelsConfig } }
             });
         }
 
@@ -340,15 +403,13 @@
         // PÁGINA 2: SEMÁFORO
         // ==========================================
         function renderPagina2() {
-            // Agrupar Sentimientos
             const sentCount = { 'Positiva':0, 'Neutro':0, 'Negativa':0 };
             const timeSem = { 'Positiva':{}, 'Neutro':{}, 'Negativa':{} };
-            const medNeg = {}; // Para Top Negativos
+            const medNeg = {}; 
 
             filteredData.forEach(r => {
                 const s = determineSentiment(getCol(r, 'CRITERIO'));
                 sentCount[s]++;
-                
                 const f = getCol(r, 'FECHA');
                 if(f) timeSem[s][f] = (timeSem[s][f]||0)+1;
 
@@ -358,37 +419,45 @@
                 }
             });
 
-            // 1. Líneas de Tiempo Semáforo
+            // 1. Líneas de Tiempo Semáforo (con formato amigable, sin datalabels para no saturar)
             const allDates = [...new Set(filteredData.map(r=>getCol(r,'FECHA')).filter(Boolean))].sort((a,b)=>{const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]);});
             charts.p2Time = new Chart(document.getElementById('c-time-sem'), {
                 type: 'line',
                 data: {
-                    labels: allDates,
+                    labels: allDates.map(formatFriendlyDate),
                     datasets: [
-                        { label: 'Positivo', data: allDates.map(d=>timeSem['Positiva'][d]||0), borderColor: colors.pos, tension: 0.3 },
-                        { label: 'Negativo', data: allDates.map(d=>timeSem['Negativa'][d]||0), borderColor: colors.neg, tension: 0.3 },
-                        { label: 'Neutro', data: allDates.map(d=>timeSem['Neutro'][d]||0), borderColor: colors.neu, tension: 0.3 }
+                        { label: 'Positivo', data: allDates.map(d=>timeSem['Positiva'][d]||0), borderColor: colors.pos, tension: 0.4, borderWidth: 2, pointRadius: 2 },
+                        { label: 'Negativo', data: allDates.map(d=>timeSem['Negativa'][d]||0), borderColor: colors.neg, tension: 0.4, borderWidth: 2, pointRadius: 2 },
+                        { label: 'Neutro', data: allDates.map(d=>timeSem['Neutro'][d]||0), borderColor: colors.neu, tension: 0.4, borderWidth: 2, pointRadius: 2 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels:{display:false}, legend:{labels:{boxWidth:10}} } }
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8}} },
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] } }, x: { grid: { display: false } } }
+                }
             });
 
             // 2. Torta Sentimientos
             charts.p2Pie = new Chart(document.getElementById('c-pie-sem'), {
                 type: 'pie',
-                data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [sentCount['Positiva'], sentCount['Neutro'], sentCount['Negativa']], backgroundColor: [colors.pos, colors.neu, colors.neg] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: pieLabelsConfig, legend:{position:'bottom'} } }
+                data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [sentCount['Positiva'], sentCount['Neutro'], sentCount['Negativa']], backgroundColor: [colors.pos, colors.neu, colors.neg], borderWidth:0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: pieLabelsConfig, legend:{position:'bottom', labels:{usePointStyle:true}} } }
             });
 
             // 3. Top Medios Negativos
             const topNeg = Object.entries(medNeg).sort((a,b)=>b[1]-a[1]).slice(0,5);
             charts.p2Top = new Chart(document.getElementById('c-top-neg'), {
                 type: 'bar',
-                data: { labels: topNeg.map(x=>x[0]), datasets: [{ data: topNeg.map(x=>x[1]), backgroundColor: colors.neg }] },
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'bold'}}}, scales:{x:{display:false}}, layout:{padding:{right:30}} }
+                data: { labels: topNeg.map(x=>x[0]), datasets: [{ data: topNeg.map(x=>x[1]), backgroundColor: colors.neg, borderRadius: 4 }] },
+                options: { 
+                    indexAxis:'y', responsive: true, maintainAspectRatio: false, 
+                    plugins:{legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'800'}}}, 
+                    scales:{x:{display:false}, y:{grid:{display:false}}}, layout:{padding:{right:30}} 
+                }
             });
 
-            // Helper para Barras Apiladas (100%)
+            // Helper Barras Apiladas con etiquetas interiores
             function buildStack(colName) {
                 const cats = [...new Set(filteredData.map(r=>getCol(r, colName)).filter(Boolean))];
                 const p=[], nu=[], ne=[];
@@ -401,53 +470,91 @@
                 return { labels:cats, p, nu, ne };
             }
 
+            const stackLabelConf = {
+                color: '#fff', font: { weight: 'bold', size: 10 },
+                display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; }
+            };
+            const stackLabelConfNeu = { ...stackLabelConf, color: '#000' };
+
             const stProt = buildStack('QUIÉN');
             charts.p2Prot = new Chart(document.getElementById('c-prot-sem'), {
                 type: 'bar',
-                data: { labels: stProt.labels, datasets: [{label:'Pos',data:stProt.p,backgroundColor:colors.pos},{label:'Neu',data:stProt.nu,backgroundColor:colors.neu},{label:'Neg',data:stProt.ne,backgroundColor:colors.neg}] },
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true},y:{stacked:true}}, plugins:{datalabels:{display:false}} }
+                data: { labels: stProt.labels, datasets: [
+                    {label:'Pos', data:stProt.p, backgroundColor:colors.pos, datalabels: stackLabelConf},
+                    {label:'Neu', data:stProt.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu},
+                    {label:'Neg', data:stProt.ne, backgroundColor:colors.neg, datalabels: stackLabelConf}
+                ]},
+                options: { 
+                    indexAxis:'y', responsive: true, maintainAspectRatio: false, 
+                    scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}}}, 
+                    plugins:{legend:{display:false}} 
+                }
             });
 
             const stMed = buildStack('TIPO DE MEDIO');
             charts.p2Med = new Chart(document.getElementById('c-med-sem'), {
                 type: 'bar',
-                data: { labels: stMed.labels, datasets: [{label:'Pos',data:stMed.p,backgroundColor:colors.pos},{label:'Neu',data:stMed.nu,backgroundColor:colors.neu},{label:'Neg',data:stMed.ne,backgroundColor:colors.neg}] },
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true},y:{stacked:true}}, plugins:{datalabels:{display:false}} }
+                data: { labels: stMed.labels, datasets: [
+                    {label:'Pos', data:stMed.p, backgroundColor:colors.pos, datalabels: stackLabelConf},
+                    {label:'Neu', data:stMed.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu},
+                    {label:'Neg', data:stMed.ne, backgroundColor:colors.neg, datalabels: stackLabelConf}
+                ]},
+                options: { 
+                    indexAxis:'y', responsive: true, maintainAspectRatio: false, 
+                    scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}}}, 
+                    plugins:{legend:{display:false}} 
+                }
             });
         }
 
         // ==========================================
-        // PÁGINA 3: AHORRO
+        // PÁGINA 3: AHORRO (Solo Positivas)
         // ==========================================
         function renderPagina3() {
             let totalS = 0;
             const ahMed = {}, ahProt = {};
 
             filteredData.forEach(r => {
-                const sVal = parseFloat((getCol(r, 'Soles')||'0').toString().replace(/[^0-9.-]+/g,""));
-                if(!isNaN(sVal)) {
-                    totalS += sVal;
-                    const tm = getCol(r, 'TIPO DE MEDIO') || 'Otros';
-                    const tp = getCol(r, 'QUIÉN') || 'Otros';
-                    ahMed[tm] = (ahMed[tm]||0) + sVal;
-                    ahProt[tp] = (ahProt[tp]||0) + sVal;
+                // REGLA: Solo calcular ahorro si la mención es Positiva
+                if(determineSentiment(getCol(r, 'CRITERIO')) === 'Positiva') {
+                    const sVal = parseFloat((getCol(r, 'Soles')||'0').toString().replace(/[^0-9.-]+/g,""));
+                    if(!isNaN(sVal)) {
+                        totalS += sVal;
+                        const tm = getCol(r, 'TIPO DE MEDIO') || 'Otros';
+                        const tp = getCol(r, 'QUIÉN') || 'Otros';
+                        ahMed[tm] = (ahMed[tm]||0) + sVal;
+                        ahProt[tp] = (ahProt[tp]||0) + sVal;
+                    }
                 }
             });
 
             document.getElementById('total-soles').innerText = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(totalS);
 
+            const moneyLabelConf = {
+                color: colors.main, anchor: 'end', align: 'end', font: {weight:'800', size: 10},
+                formatter: (val) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', maximumFractionDigits:0 }).format(val)
+            };
+
             const sortAhMed = Object.entries(ahMed).sort((a,b)=>b[1]-a[1]);
             charts.p3Med = new Chart(document.getElementById('c-ahorro-med'), {
                 type: 'bar',
-                data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}, datalabels:{display:false}} }
+                data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins:{legend:{display:false}, datalabels: moneyLabelConf},
+                    scales: {y:{display:false}, x:{grid:{display:false}}}, layout:{padding:{top:30}}
+                }
             });
 
             const sortAhProt = Object.entries(ahProt).sort((a,b)=>b[1]-a[1]);
             charts.p3Prot = new Chart(document.getElementById('c-ahorro-prot'), {
                 type: 'bar',
-                data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ data: sortAhProt.map(x=>x[1]), backgroundColor: '#3b82f6' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}, datalabels:{display:false}} }
+                data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins:{legend:{display:false}, datalabels: {...moneyLabelConf, color: colors.mainLight}},
+                    scales: {y:{display:false}, x:{grid:{display:false}}}, layout:{padding:{top:30}}
+                }
             });
         }
     </script>
