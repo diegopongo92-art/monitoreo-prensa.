@@ -57,12 +57,15 @@
         .nav-btn:hover:not(.active) { color: var(--text-dark); }
         
         .filters { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
-        input[type="date"] { 
-            padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; 
+        
+        /* NUEVO ESTILO PARA EL SELECTOR DE MES */
+        select {
+            padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; 
             font-size: 13px; color: var(--text-dark); font-weight: 600; outline: none;
-            transition: border-color 0.2s;
+            background-color: white; cursor: pointer; transition: border-color 0.2s;
         }
-        input[type="date"]:focus { border-color: var(--primary-light); }
+        select:focus { border-color: var(--primary-light); }
+        
         .btn-apply { 
             background: var(--primary); color: white; border: none; padding: 7px 14px; 
             border-radius: 6px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
@@ -170,8 +173,23 @@
             <button class="nav-btn" onclick="switchView('semaforo')">2. Semáforo</button>
             <button class="nav-btn" onclick="switchView('ahorro')">3. Ahorro</button>
         </div>
+        
         <div class="filters">
-            <input type="date" id="date-start"> a <input type="date" id="date-end">
+            <label for="month-select" style="color: var(--text-muted);">Mes (Actual):</label>
+            <select id="month-select">
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8">Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+            </select>
             <button class="btn-apply" onclick="applyFilter()">Filtrar</button>
         </div>
     </header>
@@ -256,7 +274,7 @@
         Chart.register(ChartDataLabels);
         Chart.defaults.color = '#475569';
         Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.font.size = 13; // SUBIMOS EL TAMAÑO BASE GENERAL
+        Chart.defaults.font.size = 13; 
 
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
         const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb', sky: '#60a5fa' };
@@ -268,7 +286,7 @@
             download: true, header: true,
             complete: function(results) {
                 rawData = results.data;
-                setDefaultDates();
+                setDefaultMonth(); // Cambiado a selector de mes
                 applyFilter();
                 document.getElementById('loading').style.display = 'none';
             }
@@ -294,11 +312,10 @@
             return isNaN(num) ? 0 : num;
         }
 
-        function setDefaultDates() {
+        // NUEVA FUNCIÓN PARA SELECCIONAR MES ACTUAL POR DEFECTO
+        function setDefaultMonth() {
             const today = new Date();
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            document.getElementById('date-start').value = firstDay.toISOString().split('T')[0];
-            document.getElementById('date-end').value = today.toISOString().split('T')[0];
+            document.getElementById('month-select').value = today.getMonth();
         }
 
         function switchView(viewId) {
@@ -308,20 +325,18 @@
             document.getElementById('view-' + viewId).classList.add('active');
         }
 
+        // NUEVA LÓGICA DE FILTRADO POR MES
         function applyFilter() {
-            const startVal = document.getElementById('date-start').value;
-            const endVal = document.getElementById('date-end').value;
+            const selectedMonth = parseInt(document.getElementById('month-select').value);
+            const currentYear = new Date().getFullYear(); // Usa el año en curso
             
-            if(!startVal || !endVal) return;
-
-            const s = startVal.split('-');
-            const e = endVal.split('-');
+            // Rango del mes seleccionado
+            const start = new Date(currentYear, selectedMonth, 1);
+            const end = new Date(currentYear, selectedMonth + 1, 0, 23, 59, 59); // Último día del mes
             
-            const start = new Date(s[0], s[1]-1, s[2]);
-            const end = new Date(e[0], e[1]-1, e[2], 23, 59, 59);
-            
-            const prevStart = new Date(s[0], s[1]-2, s[2]);
-            const prevEnd = new Date(e[0], e[1]-2, e[2], 23, 59, 59);
+            // Rango del mes anterior (para el KPI)
+            const prevStart = new Date(currentYear, selectedMonth - 1, 1);
+            const prevEnd = new Date(currentYear, selectedMonth, 0, 23, 59, 59);
             
             filteredData = rawData.filter(row => {
                 const f = getCol(row, 'FECHA');
@@ -382,9 +397,8 @@
             return `${parseInt(p[0], 10)} ${monthNames[parseInt(p[1], 10)-1]}`;
         }
 
-        // CONFIGURACIONES DE ETIQUETAS POTENCIADAS
         const datalabelsConfig = {
-            color: varCol => varCol || colors.main, font: { weight: '800', size: 13 }, // Tamaño 13
+            color: varCol => varCol || colors.main, font: { weight: '800', size: 13 },
             anchor: 'end', align: 'end',
             formatter: (val, ctx) => {
                 if(!val) return '';
@@ -393,7 +407,7 @@
             }
         };
         const pieLabelsConfig = {
-            color: '#fff', font: { weight: 'bold', size: 14 }, // Tamaño 14 para tortas
+            color: '#fff', font: { weight: 'bold', size: 14 },
             textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.6)',
             formatter: (val, ctx) => {
                 const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
@@ -401,7 +415,7 @@
             }
         };
         const scaleAxesConfig = {
-            ticks: { font: { size: 12, weight: '600' }, color: '#334155' } // Ejes con más peso visual
+            ticks: { font: { size: 12, weight: '600' }, color: '#334155' } 
         };
         const tooltipConfig = {
             enabled: true, titleFont: { size: 14 }, bodyFont: { size: 13 }, padding: 10
@@ -433,7 +447,7 @@
                 type: 'line',
                 data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: colors.mainLight+'20', fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: colors.main }] },
                 options: { 
-                    interaction: { mode: 'index', intersect: false }, // Interactividad Magnética
+                    interaction: { mode: 'index', intersect: false }, 
                     responsive: true, maintainAspectRatio: false, 
                     plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '800', size: 13 } } }, 
                     scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
@@ -501,7 +515,7 @@
                     ]
                 },
                 options: { 
-                    interaction: { mode: 'index', intersect: false }, // INTERACTIVIDAD MAGNÉTICA
+                    interaction: { mode: 'index', intersect: false }, 
                     responsive: true, maintainAspectRatio: false, 
                     plugins: { tooltip: tooltipConfig, datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:13}}} }, 
                     scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
