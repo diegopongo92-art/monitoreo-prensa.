@@ -78,16 +78,16 @@
         .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PAGINA 1: Vista General (Ajustado para devolver todos los gráficos) */
+        /* PAGINA 1: Vista General (Reestructurada a 12 columnas para dar el espacio perfecto) */
         #view-general {
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 38% calc(62% - 12px);
             grid-template-areas: 
-                "kpi time pie"
-                "prot temat orig";
+                "kpi kpi time time time time time time time pie pie pie"
+                "prot prot prot prot temat temat temat temat orig orig orig orig";
         }
 
-        /* PAGINA 2: Semáforo (Grid 3 columnas) */
+        /* PAGINA 2: Semáforo */
         #view-semaforo {
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 45% calc(55% - 12px);
@@ -98,7 +98,7 @@
 
         /* PAGINA 3: Ahorro */
         #view-ahorro {
-            grid-template-columns: 30% calc(70% - 12px);
+            grid-template-columns: 25% calc(75% - 12px);
             grid-template-rows: 100%;
             grid-template-areas: "kpi bars";
         }
@@ -129,16 +129,16 @@
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 12px;}
         .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 12px;}
 
-        /* ESTILOS DE LOS KPI */
+        /* ESTILOS DE LOS KPI (Reducidos para ser más compactos) */
         .kpi-box { 
-            text-align: center; color: white; padding: 25px; border-radius: var(--radius); flex: 1; 
+            text-align: center; color: white; padding: 20px; border-radius: var(--radius); flex: 1; 
             display:flex; flex-direction:column; justify-content:center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             box-shadow: var(--shadow-md);
         }
-        .kpi-box h4 { margin: 0 0 10px 0; font-size: 14px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
-        .kpi-box h2 { margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
-        .kpi-sub { font-size: 11px; margin-top: 10px; opacity: 0.8; font-weight: 500; }
+        .kpi-box h4 { margin: 0 0 8px 0; font-size: 13px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
+        .kpi-box h2 { margin: 0; font-size: 38px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .kpi-sub { font-size: 11px; margin-top: 8px; opacity: 0.8; font-weight: 500; }
 
         /* LOADING SPINNER */
         #loading { 
@@ -173,7 +173,7 @@
             <div class="kpi-box">
                 <h4>TOTAL MENCIONES</h4>
                 <h2 id="total-menciones">0</h2>
-                <span class="kpi-sub">En el periodo seleccionado</span>
+                <span class="kpi-sub">En el periodo</span>
             </div>
         </div>
 
@@ -182,7 +182,7 @@
             <div class="chart-container"><canvas id="c-time"></canvas></div>
         </div>
         <div class="chart-card box-pie">
-            <h3>Tipo de Medio (Número y %)</h3>
+            <h3>Tipo de Medio (%)</h3>
             <div class="chart-container"><canvas id="c-medio"></canvas></div>
         </div>
         
@@ -190,13 +190,12 @@
             <h3>Top Protagonistas</h3>
             <div class="chart-container"><canvas id="c-prot"></canvas></div>
         </div>
-        
         <div class="chart-card box-temat">
             <h3>Temática (Top 10)</h3>
             <div class="chart-container"><canvas id="c-temat"></canvas></div>
         </div>
         <div class="chart-card box-orig">
-            <h3>Origen de Posicionamiento (Top 10)</h3>
+            <h3>Origen de Posicionamiento</h3>
             <div class="chart-container"><canvas id="c-orig"></canvas></div>
         </div>
     </div>
@@ -229,7 +228,7 @@
             <div class="kpi-box">
                 <h4>AHORRO PUBLICITARIO</h4>
                 <h2 id="total-soles">S/ 0.00</h2>
-                <span class="kpi-sub">*(Calculado solo en menciones POSITIVAS)</span>
+                <span class="kpi-sub">*(Menciones POSITIVAS)</span>
             </div>
         </div>
         <div class="box-bars-a">
@@ -426,7 +425,7 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:11, family:'Inter'}}}, datalabels: pieLabelsConfig } }
             });
 
-            // 3. Protagonistas (GRÁFICO RESTAURADO)
+            // 3. Protagonistas
             const prot = groupData('QUIÉN').slice(0, 10);
             charts.p1Prot = new Chart(document.getElementById('c-prot'), {
                 type: 'bar',
@@ -438,7 +437,7 @@
                 }
             });
 
-            // 4. Temática (Top 10)
+            // 4. Temática
             const temat = groupData('TEMA').slice(0, 10);
             charts.p1Temat = new Chart(document.getElementById('c-temat'), {
                 type: 'bar',
@@ -450,7 +449,7 @@
                 }
             });
 
-            // 5. Origen (Top 10)
+            // 5. Origen
             const orig = groupData('ORIGEN').slice(0, 10);
             charts.p1Orig = new Chart(document.getElementById('c-orig'), {
                 type: 'bar',
