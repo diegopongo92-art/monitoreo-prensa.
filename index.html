@@ -18,7 +18,7 @@
             --primary: #002f80;
             --primary-light: #2563eb;
             --text-dark: #0f172a;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --border: #e2e8f0;
             --pos: #10b981; 
             --neu: #f59e0b; 
@@ -44,28 +44,28 @@
             background: var(--card-bg); border-radius: var(--radius); 
             box-shadow: var(--shadow-sm);
         }
-        .header-left h1 { margin: 0; font-size: 18px; color: var(--primary); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; }
-        .header-left p { margin: 2px 0 0 0; font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
+        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; }
+        .header-left p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
         
         .nav-buttons { display: flex; gap: 8px; background: var(--bg-color); padding: 4px; border-radius: 8px; }
         .nav-btn {
             background: transparent; border: none; color: var(--text-muted);
-            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;
             transition: all 0.2s ease;
         }
         .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 800;}
         .nav-btn:hover:not(.active) { color: var(--text-dark); }
         
-        .filters { display: flex; gap: 10px; align-items: center; font-size: 12px; font-weight: 600;}
+        .filters { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
         input[type="date"] { 
             padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; 
-            font-size: 12px; color: var(--text-dark); font-weight: 600; outline: none;
+            font-size: 13px; color: var(--text-dark); font-weight: 600; outline: none;
             transition: border-color 0.2s;
         }
         input[type="date"]:focus { border-color: var(--primary-light); }
         .btn-apply { 
             background: var(--primary); color: white; border: none; padding: 7px 14px; 
-            border-radius: 6px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm);
+            border-radius: 6px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
             transition: background 0.2s, transform 0.1s; 
         }
         .btn-apply:hover { background: var(--primary-light); transform: translateY(-1px); }
@@ -87,7 +87,7 @@
                 "prot prot prot prot temat temat temat temat orig orig orig orig";
         }
 
-        /* PAGINA 2: Semáforo (Corregido para línea de tiempo ancha y 3 barras iguales abajo) */
+        /* PAGINA 2: Semáforo */
         #view-semaforo {
             grid-template-columns: repeat(12, 1fr);
             grid-template-rows: 45% calc(55% - 12px);
@@ -129,24 +129,24 @@
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 12px;}
         .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 12px;}
 
-        /* ESTILOS DE LOS KPI CON TENDENCIA */
+        /* ESTILOS DE LOS KPI */
         .kpi-box { 
             text-align: center; color: white; padding: 20px; border-radius: var(--radius); flex: 1; 
             display:flex; flex-direction:column; justify-content:center; align-items: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             box-shadow: var(--shadow-md);
         }
-        .kpi-box h4 { margin: 0 0 8px 0; font-size: 13px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
-        .kpi-box h2 { margin: 0; font-size: 38px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        .kpi-box h4 { margin: 0 0 8px 0; font-size: 14px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px;}
+        .kpi-box h2 { margin: 0; font-size: 42px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
         
         .trend-badge {
-            margin-top: 10px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700;
+            margin-top: 10px; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
             display: inline-flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .trend-badge.up { background-color: #dcfce7; color: #166534; }
         .trend-badge.down { background-color: #fee2e2; color: #991b1b; }
         .trend-badge.flat { background-color: #f1f5f9; color: #475569; }
-        .kpi-sub { font-size: 11px; margin-top: 8px; opacity: 0.8; font-weight: 500; }
+        .kpi-sub { font-size: 12px; margin-top: 8px; opacity: 0.8; font-weight: 500; }
 
         /* LOADING SPINNER */
         #loading { 
@@ -252,11 +252,11 @@
     </div>
 
     <script>
-        // Registrar plugin DataLabels y configurar fuentes bases más grandes
+        // Registrar plugin DataLabels y CONFIGURACIÓN GLOBAL DE TAMAÑOS
         Chart.register(ChartDataLabels);
         Chart.defaults.color = '#475569';
         Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.font.size = 11; // Aumentado para mejor legibilidad general
+        Chart.defaults.font.size = 13; // SUBIMOS EL TAMAÑO BASE GENERAL
 
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
         const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb', sky: '#60a5fa' };
@@ -264,7 +264,6 @@
         
         let rawData = [], filteredData = [], prevData = [], charts = {};
 
-        // INICIALIZACIÓN Y LECTURA
         Papa.parse(CSV_URL, {
             download: true, header: true,
             complete: function(results) {
@@ -321,7 +320,6 @@
             const start = new Date(s[0], s[1]-1, s[2]);
             const end = new Date(e[0], e[1]-1, e[2], 23, 59, 59);
             
-            // Cálculo del periodo anterior exacto para el KPI (1 mes atrás)
             const prevStart = new Date(s[0], s[1]-2, s[2]);
             const prevEnd = new Date(e[0], e[1]-2, e[2], 23, 59, 59);
             
@@ -350,7 +348,6 @@
             Object.values(charts).forEach(c => c.destroy());
             charts = {};
             
-            // Actualizar KPI de Total Menciones
             const currCount = filteredData.length;
             const prevCount = prevData.length;
             document.getElementById('total-menciones').innerText = currCount.toLocaleString('es-PE');
@@ -385,9 +382,9 @@
             return `${parseInt(p[0], 10)} ${monthNames[parseInt(p[1], 10)-1]}`;
         }
 
-        // Configuraciones de etiquetas más grandes
+        // CONFIGURACIONES DE ETIQUETAS POTENCIADAS
         const datalabelsConfig = {
-            color: varCol => varCol || colors.main, font: { weight: '800', size: 12 }, // Aumentado a 12
+            color: varCol => varCol || colors.main, font: { weight: '800', size: 13 }, // Tamaño 13
             anchor: 'end', align: 'end',
             formatter: (val, ctx) => {
                 if(!val) return '';
@@ -396,15 +393,18 @@
             }
         };
         const pieLabelsConfig = {
-            color: '#fff', font: { weight: 'bold', size: 13 }, // Aumentado a 13
-            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.5)',
+            color: '#fff', font: { weight: 'bold', size: 14 }, // Tamaño 14 para tortas
+            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.6)',
             formatter: (val, ctx) => {
                 const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                 return `${val}\n(${(val*100/sum).toFixed(1)}%)`;
             }
         };
         const scaleAxesConfig = {
-            ticks: { font: { size: 11, weight: '500' } } // Ejes más grandes
+            ticks: { font: { size: 12, weight: '600' }, color: '#334155' } // Ejes con más peso visual
+        };
+        const tooltipConfig = {
+            enabled: true, titleFont: { size: 14 }, bodyFont: { size: 13 }, padding: 10
         };
 
         function groupData(colName) {
@@ -431,36 +431,41 @@
             
             charts.p1Time = new Chart(document.getElementById('c-time'), {
                 type: 'line',
-                data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: colors.mainLight+'20', fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: colors.main }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '800', size: 12 } } }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } }
+                data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: colors.mainLight+'20', fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: colors.main }] },
+                options: { 
+                    interaction: { mode: 'index', intersect: false }, // Interactividad Magnética
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '800', size: 13 } } }, 
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                }
             });
 
             const med = groupData('TIPO DE MEDIO');
             charts.p1Medio = new Chart(document.getElementById('c-medio'), {
                 type: 'doughnut',
                 data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:12, family:'Inter'}}}, datalabels: pieLabelsConfig } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { tooltip: tooltipConfig, legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:13, family:'Inter'}}}, datalabels: pieLabelsConfig } }
             });
 
             const prot = groupData('QUIÉN').slice(0, 10);
             charts.p1Prot = new Chart(document.getElementById('c-prot'), {
                 type: 'bar',
                 data: { labels: prot.map(x=>x[0]), datasets: [{ data: prot.map(x=>x[1]), backgroundColor: colors.sky, borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.sky} }, layout:{padding:{right:65}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.sky} }, layout:{padding:{right:70}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
 
             const temat = groupData('TEMA').slice(0, 10);
             charts.p1Temat = new Chart(document.getElementById('c-temat'), {
                 type: 'bar',
                 data: { labels: temat.map(x=>x[0]), datasets: [{ data: temat.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.mainLight} }, layout:{padding:{right:65}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.mainLight} }, layout:{padding:{right:70}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
 
             const orig = groupData('ORIGEN').slice(0, 10);
             charts.p1Orig = new Chart(document.getElementById('c-orig'), {
                 type: 'bar',
                 data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, layout:{padding:{right:65}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, layout:{padding:{right:70}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
         }
 
@@ -490,25 +495,30 @@
                 data: {
                     labels: allDates.map(formatFriendlyDate),
                     datasets: [
-                        { label: 'Positivo', data: allDates.map(d=>timeSem['Positiva'][d]||0), borderColor: colors.pos, tension: 0.4, borderWidth: 2.5, pointRadius: 3 },
-                        { label: 'Negativo', data: allDates.map(d=>timeSem['Negativa'][d]||0), borderColor: colors.neg, tension: 0.4, borderWidth: 2.5, pointRadius: 3 },
-                        { label: 'Neutro', data: allDates.map(d=>timeSem['Neutro'][d]||0), borderColor: colors.neu, tension: 0.4, borderWidth: 2.5, pointRadius: 3 }
+                        { label: 'Positivo', data: allDates.map(d=>timeSem['Positiva'][d]||0), borderColor: colors.pos, backgroundColor: colors.pos, tension: 0.4, borderWidth: 3, pointRadius: 3, pointHoverRadius: 6 },
+                        { label: 'Negativo', data: allDates.map(d=>timeSem['Negativa'][d]||0), borderColor: colors.neg, backgroundColor: colors.neg, tension: 0.4, borderWidth: 3, pointRadius: 3, pointHoverRadius: 6 },
+                        { label: 'Neutro', data: allDates.map(d=>timeSem['Neutro'][d]||0), borderColor: colors.neu, backgroundColor: colors.neu, tension: 0.4, borderWidth: 3, pointRadius: 3, pointHoverRadius: 6 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:12}}} }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } }
+                options: { 
+                    interaction: { mode: 'index', intersect: false }, // INTERACTIVIDAD MAGNÉTICA
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { tooltip: tooltipConfig, datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:13}}} }, 
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                }
             });
 
             charts.p2Pie = new Chart(document.getElementById('c-pie-sem'), {
                 type: 'pie',
                 data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [sentCount['Positiva'], sentCount['Neutro'], sentCount['Negativa']], backgroundColor: [colors.pos, colors.neu, colors.neg], borderWidth:0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: pieLabelsConfig, legend:{position:'bottom', labels:{usePointStyle:true, font:{size:12}}} } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, datalabels: pieLabelsConfig, legend:{position:'bottom', labels:{usePointStyle:true, font:{size:13}}} } }
             });
 
             const topNeg = Object.entries(medNeg).sort((a,b)=>b[1]-a[1]).slice(0,5);
             charts.p2Top = new Chart(document.getElementById('c-top-neg'), {
                 type: 'bar',
                 data: { labels: topNeg.map(x=>x[0]), datasets: [{ data: topNeg.map(x=>x[1]), backgroundColor: colors.neg, borderRadius: 4 }] },
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'800', size:12}}}, scales:{x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{right:30}} }
+                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'800', size:13}}}, scales:{x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{right:40}} }
             });
 
             function buildStack(colName) {
@@ -523,21 +533,21 @@
                 return { labels:cats, p, nu, ne };
             }
 
-            const stackLabelConf = { color: '#fff', font: { weight: 'bold', size: 11 }, display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; } };
+            const stackLabelConf = { color: '#fff', font: { weight: 'bold', size: 13 }, display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; } };
             const stackLabelConfNeu = { ...stackLabelConf, color: '#000' };
 
             const stProt = buildStack('QUIÉN');
             charts.p2Prot = new Chart(document.getElementById('c-prot-sem'), {
                 type: 'bar',
-                data: { labels: stProt.labels, datasets: [ {label:'Pos', data:stProt.p, backgroundColor:colors.pos, datalabels: stackLabelConf}, {label:'Neu', data:stProt.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu}, {label:'Neg', data:stProt.ne, backgroundColor:colors.neg, datalabels: stackLabelConf} ]},
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{legend:{display:false}} }
+                data: { labels: stProt.labels, datasets: [ {label:'Positivo', data:stProt.p, backgroundColor:colors.pos, datalabels: stackLabelConf}, {label:'Neutro', data:stProt.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu}, {label:'Negativo', data:stProt.ne, backgroundColor:colors.neg, datalabels: stackLabelConf} ]},
+                options: { interaction: { mode: 'index', intersect: false }, indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{ tooltip: tooltipConfig, legend:{display:false}} }
             });
 
             const stMed = buildStack('TIPO DE MEDIO');
             charts.p2Med = new Chart(document.getElementById('c-med-sem'), {
                 type: 'bar',
-                data: { labels: stMed.labels, datasets: [ {label:'Pos', data:stMed.p, backgroundColor:colors.pos, datalabels: stackLabelConf}, {label:'Neu', data:stMed.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu}, {label:'Neg', data:stMed.ne, backgroundColor:colors.neg, datalabels: stackLabelConf} ]},
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{legend:{display:false}} }
+                data: { labels: stMed.labels, datasets: [ {label:'Positivo', data:stMed.p, backgroundColor:colors.pos, datalabels: stackLabelConf}, {label:'Neutro', data:stMed.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu}, {label:'Negativo', data:stMed.ne, backgroundColor:colors.neg, datalabels: stackLabelConf} ]},
+                options: { interaction: { mode: 'index', intersect: false }, indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{ tooltip: tooltipConfig, legend:{display:false}} }
             });
         }
 
@@ -565,22 +575,22 @@
             document.getElementById('total-soles').innerText = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(totalS);
 
             const moneyLabelConf = {
-                color: colors.main, anchor: 'end', align: 'end', font: {weight:'800', size: 12}, // Aumentado a 12
+                color: colors.main, anchor: 'end', align: 'end', font: {weight:'800', size: 13},
                 formatter: (val) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', maximumFractionDigits:0 }).format(val)
             };
 
             const sortAhMed = Object.entries(ahMed).sort((a,b)=>b[1]-a[1]);
             charts.p3Med = new Chart(document.getElementById('c-ahorro-med'), {
                 type: 'bar',
-                data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}, datalabels: moneyLabelConf}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
+                data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: moneyLabelConf}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
             });
 
             const sortAhProt = Object.entries(ahProt).sort((a,b)=>b[1]-a[1]);
             charts.p3Prot = new Chart(document.getElementById('c-ahorro-prot'), {
                 type: 'bar',
-                data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}, datalabels: {...moneyLabelConf, color: colors.mainLight}}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
+                data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: {...moneyLabelConf, color: colors.mainLight}}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
             });
         }
     </script>
