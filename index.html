@@ -264,29 +264,24 @@
         // Búsqueda de columna más estricta y segura
         function getCol(row, keyword) {
             const keys = Object.keys(row);
-            // Primero buscar coincidencia exacta
             let key = keys.find(k => k.trim().toUpperCase() === keyword.trim().toUpperCase());
-            // Si no, buscar parcial
             if (!key) key = keys.find(k => k.toUpperCase().includes(keyword.toUpperCase()));
             return key ? row[key] : null;
         }
 
-        // Lector seguro de moneda (soporta formatos "1,200.50" y "1.200,50")
+        // Lector seguro de moneda
         function parseCurrency(val) {
             if(!val) return 0;
             let str = val.toString().trim();
-            // Quitar símbolos de moneda y letras, dejando números, comas, puntos y guiones
             str = str.replace(/[^0-9.,-]/g, '');
             if(str === '') return 0;
             
             const lastComma = str.lastIndexOf(',');
             const lastDot = str.lastIndexOf('.');
             
-            // Si la coma está después del punto, es formato Latino/Europeo (1.234,50)
             if (lastComma > lastDot) {
                 str = str.replace(/\./g, '').replace(',', '.');
             } else {
-                // Formato Americano (1,234.50) o número simple sin miles (1234.50)
                 str = str.replace(/,/g, '');
             }
             
@@ -309,15 +304,27 @@
         }
 
         function applyFilter() {
-            const start = new Date(document.getElementById('date-start').value);
-            const end = new Date(document.getElementById('date-end').value);
+            const startVal = document.getElementById('date-start').value;
+            const endVal = document.getElementById('date-end').value;
+            
+            if(!startVal || !endVal) return;
+
+            // Cortar strings manualmente para evitar problema de zona horaria de JS
+            const s = startVal.split('-');
+            const e = endVal.split('-');
+            
+            // Forzar fechas a medianoche local, y al último segundo del día final
+            const start = new Date(s[0], s[1]-1, s[2]);
+            const end = new Date(e[0], e[1]-1, e[2], 23, 59, 59);
             
             filteredData = rawData.filter(row => {
                 const f = getCol(row, 'FECHA');
                 if(!f) return false;
                 const p = f.split('/');
                 if(p.length !== 3) return false;
+                
                 const d = new Date(p[2], p[1]-1, p[0]);
+                
                 return d >= start && d <= end;
             });
             renderAll();
@@ -327,7 +334,7 @@
             Object.values(charts).forEach(c => c.destroy());
             charts = {};
             
-            // Actualizar KPI de total de menciones en la Página 1
+            // Actualizar KPI
             document.getElementById('total-menciones').innerText = filteredData.length.toLocaleString('es-PE');
 
             renderPagina1();
@@ -498,7 +505,7 @@
                 }
             });
 
-            // Helper Barras Apiladas con etiquetas interiores
+            // Helper Barras Apiladas
             function buildStack(colName) {
                 const cats = [...new Set(filteredData.map(r=>getCol(r, colName)).filter(Boolean))];
                 const p=[], nu=[], ne=[];
@@ -556,9 +563,7 @@
             const ahMed = {}, ahProt = {};
 
             filteredData.forEach(r => {
-                // REGLA: Estrictamente Menciones Positivas
                 if(determineSentiment(getCol(r, 'CRITERIO')) === 'Positiva') {
-                    // Extraer valor explícitamente de la columna 'SOLES' usando parseCurrency
                     const rawVal = getCol(r, 'SOLES');
                     const sVal = parseCurrency(rawVal);
                     
