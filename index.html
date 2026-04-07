@@ -3,182 +3,708 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Monitoreo - Lima</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dashboard de Monitoreo de Medios - MML</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255,255,255,0.05);
+            --primary: #3b82f6;
+            --positive: #10b981;
+            --negative: #ef4444;
+            --neutral: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Cabecera y Navegación */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .main-title h1 {
+            font-size: 24px;
+            margin: 0;
+            color: white;
+        }
+
+        .main-title p {
+            margin: 5px 0 0;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Sección de Filtros */
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        input[type="date"] {
+            background-color: #0b1120;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .apply-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .apply-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* KPI y Layout Principal */
+        .kpi-row {
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .kpi-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            font-size: 48px;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .dashboard-view {
+            display: none; /* Oculto por defecto */
+        }
+
+        .dashboard-view.active {
+            display: block; /* Muestra solo la vista activa */
+        }
+
+        /* Estilo de Gráficos (Grid Layout) */
+        .charts-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Layout específico para Vista General */
+        .view-general-grid {
+            grid-template-areas: 
+                "total total total total"
+                "total total total total"
+                "time time orig orig"
+                "temat temat pie pie";
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto auto auto;
+        }
+
+        /* Layout específico para Vista Semáforo */
+        .view-semaforo-grid {
+            grid-template-areas: 
+                "time-sem time-sem pie-sem"
+                "bar-sem-1 bar-sem-1 bar-sem-2";
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .chart-box {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            height: 300px; /* Altura estándar */
+            position: relative;
+        }
+
+        .chart-box h3 {
+            margin-top: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        /* Clases para posicionar en la Grid */
+        .box-kpi { grid-area: kpi; height: auto; align-self: start; }
+        .box-time { grid-area: time; height: 400px; }
+        .box-origen { grid-area: orig; height: 400px; }
+        .box-temat { grid-area: temat; height: 400px; }
+        .box-pie { grid-area: pie; height: 400px; display: flex; gap: 10px; }
+
+        .box-time-sem { grid-area: time-sem; height: 350px; }
+        .box-pie-sem { grid-area: pie-sem; height: 350px; }
+        .box-bar-sem-1 { grid-area: bar-sem-1; height: 300px; }
+        .box-bar-sem-2 { grid-area: bar-sem-2; height: 300px; }
+
+        canvas {
+            width: 100% !important;
+            height: calc(100% - 30px) !important;
+        }
+
+        /* Vista de Ahorro - Tabla Simple */
+        .saving-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .saving-table th, .saving-table td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .saving-table th {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .saving-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .box-half-pie {
+            flex: 1;
+        }
+
+        /* Estado de Carga */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: var(--text-muted); font-weight: bold;
+            z-index: 100;
+        }
+        
+        @media (max-width: 1024px) {
+            .view-general-grid {
+                grid-template-areas: 
+                    "total"
+                    "time"
+                    "orig"
+                    "temat"
+                    "pie";
+                grid-template-columns: 1fr;
+            }
+            .chart-box { height: auto !important; }
+            .box-pie { flex-direction: column; }
+            canvas { height: 200px !important; }
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+<body>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
-                    Panel de Monitoreo de Medios
-                </h1>
-                <p class="text-gray-400 mt-1">Sincronizado con Google Sheets</p>
-            </div>
-            <div id="status" class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20 flex items-center gap-2">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                En vivo
-            </div>
-        </div>
+    <div id="loading-screen">Cargando Dashboard...</div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-                <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Menciones este mes</p>
-                <div class="flex items-end justify-between mt-2">
-                    <h2 id="total-mes" class="text-5xl font-bold italic tracking-tighter">--</h2>
-                    <div id="comparativo-container" class="mb-1">
-                        <span id="comparativo-val" class="px-2 py-1 rounded text-sm font-bold tracking-tight">--</span>
-                    </div>
+    <div class="dashboard-container">
+        
+        <header>
+            <div class="main-title">
+                <h1>Monitoreo de Medios</h1>
+                <p>Municipalidad Metropolitana de Lima (MML)</p>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="switchView('general')">Vista General</button>
+                <button class="nav-btn" onclick="switchView('semaforo')">Vista Semáforo</button>
+                <button class="nav-btn" onclick="switchView('ahorro')">Ahorro Producido</button>
+            </div>
+        </header>
+
+        <section class="controls">
+            <div class="date-filter">
+                <label>Rango de fechas:</label>
+                <input type="date" id="date-start" value="2026-03-01">
+                <label>hasta</label>
+                <input type="date" id="date-end" value="2026-03-31">
+            </div>
+            <button class="apply-btn" onclick="applyFilter()">Aplicar Filtro</button>
+        </section>
+
+        <section class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label"># Menciones totales</div>
+                <div class="kpi-value" id="kpi-total-menciones">--</div>
+            </div>
+        </section>
+
+        <section id="view-general" class="dashboard-view charts-grid view-general-grid active">
+            
+            <div class="chart-box box-time">
+                <h3># Menciones en el tiempo</h3>
+                <canvas id="chart-menciones-tiempo-general"></canvas>
+            </div>
+
+            <div class="chart-box box-origen">
+                <h3>Origen del posicionamiento</h3>
+                <canvas id="chart-origen-general"></canvas>
+            </div>
+
+            <div class="chart-box box-temat">
+                <h3>Temática</h3>
+                <canvas id="chart-tematica-general"></canvas>
+            </div>
+
+            <div class="chart-box box-pie">
+                <div class="box-half-pie">
+                    <h3>Tipo de medios</h3>
+                    <canvas id="chart-tipo-medio-general"></canvas>
                 </div>
-                <p class="text-gray-500 text-xs mt-4 italic">vs. mes anterior: <span id="total-pasado">--</span></p>
-            </div>
-
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-                <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Sentimiento Hoy</p>
-                <div class="mt-2 flex items-center gap-4">
-                    <div id="emoji-sentimiento" class="text-5xl italic font-black">--</div>
-                    <div>
-                        <h2 id="status-texto" class="text-xl font-bold">Analizando...</h2>
-                    </div>
+                <div class="box-half-pie">
+                    <h3>Protagonista</h3>
+                    <canvas id="chart-protagonista-general"></canvas>
                 </div>
             </div>
 
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl overflow-hidden relative">
-                <div class="relative z-10">
-                    <p class="text-gray-400 text-sm font-medium uppercase tracking-wider">Casos de Urgencia "ALTA"</p>
-                    <h2 id="urgencia-total" class="text-5xl font-bold mt-2">--</h2>
-                </div>
-                <div class="absolute right-0 bottom-0 opacity-10">
-                    <i data-lucide="alert-triangle" class="w-24 h-24 text-red-500"></i>
-                </div>
-            </div>
-        </div>
+        </section>
 
-        <div class="bg-gray-800 p-8 rounded-3xl border border-gray-700 shadow-2xl">
-            <h3 class="text-lg font-semibold mb-6 flex items-center gap-2 italic">
-                <i data-lucide="trending-up" class="w-5 h-5 text-blue-400"></i>
-                Línea de Tiempo: Menciones Diarias
-            </h3>
-            <div class="h-[400px]">
-                <canvas id="mencionesChart"></canvas>
+        <section id="view-semaforo" class="dashboard-view charts-grid view-semaforo-grid">
+            
+            <div class="chart-box box-time-sem">
+                <h3># Menciones en el tiempo por sentimiento</h3>
+                <canvas id="chart-menciones-tiempo-semaforo"></canvas>
             </div>
-        </div>
+
+            <div class="chart-box box-pie-sem">
+                <h3>Criterio de Imagen (Total)</h3>
+                <canvas id="chart-criterio-general-semaforo"></canvas>
+            </div>
+
+            <div class="chart-box box-bar-sem-1">
+                <h3>Criterio de Imagen x Tipo de Medio</h3>
+                <canvas id="chart-bar-medio-semaforo"></canvas>
+            </div>
+
+            <div class="chart-box box-bar-sem-2">
+                <h3>Criterio de Imagen x Protagonista</h3>
+                <canvas id="chart-bar-protagonista-semaforo"></canvas>
+            </div>
+
+        </section>
+
+        <section id="view-ahorro" class="dashboard-view charts-grid">
+            <div class="chart-box" style="height: auto;">
+                <h3>Resumen de Ahorro Producido (Soles)</h3>
+                <table class="saving-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Total Ahorrado (S/)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Total Ahorro Producido (Mes seleccionado)</td>
+                            <td style="font-size: 20px; font-weight: bold; color: var(--positive);" id="saving-value-soles">--</td>
+                        </tr>
+                        <tr>
+                            <td>Total Ahorro Equivalente (USD)</td>
+                            <td id="saving-value-usd">--</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">* Los valores mostrados corresponden a la suma de las columnas de ahorro para los registros que cumplen con el filtro de fecha actual.</p>
+            </div>
+        </section>
+
     </div>
 
     <script>
+        // URL de tu CSV de Google Sheets
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
+        
+        let rawData = [];
+        let filteredData = [];
+        let charts = {}; // Para guardar las instancias de los gráficos
 
+        // Configuración de Colores basada en las imágenes
+        const blueScale = ['#1e3a8a', '#1e40af', '#2563eb', '#60a5fa', '#93c5fd', '#bfdbfe'];
+        const semaforoColors = {
+            'Positiva': '#10b981', // Verde
+            'Neutro': '#f59e0b',   // Amarillo
+            'Negativa': '#ef4444'  // Rojo
+        };
+
+        // --- Lógica Inicial y de Carga ---
         async function init() {
-            lucide.createIcons();
-            
-            Papa.parse(CSV_URL, {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    processData(results.data);
-                }
+            try {
+                rawData = await loadData();
+                document.getElementById('loading-screen').style.display = 'none';
+                applyFilter(); // Ejecuta filtro inicial con fechas por defecto
+            } catch (error) {
+                console.error("Error cargando el dashboard:", error);
+                document.getElementById('loading-screen').innerText = "Error cargando los datos.";
+            }
+        }
+
+        function loadData() {
+            return new Promise((resolve, reject) => {
+                Papa.parse(CSV_URL, {
+                    download: true,
+                    header: true,
+                    complete: results => resolve(results.data),
+                    error: err => reject(err)
+                });
             });
         }
 
-        function processData(data) {
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
+        // --- Navegación entre Vistas ---
+        function switchView(viewId) {
+            // Desactivar botones y vistas anteriores
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.dashboard-view').forEach(view => view.classList.remove('active'));
             
-            let countMesActual = 0;
-            let countMesPasado = 0;
-            let urgenciaAlta = 0;
-            let timeline = {};
+            // Activar nuevo botón y vista
+            event.target.classList.add('active');
+            document.getElementById('view-' + viewId).classList.add('active');
+        }
 
-            data.forEach(row => {
-                const fechaStr = row['FECHA DE PUBLICACIÓN'];
-                if(!fechaStr) return;
+        // --- Lógica de Filtro de Fechas ---
+        function applyFilter() {
+            const startStr = document.getElementById('date-start').value;
+            const endStr = document.getElementById('date-end').value;
+            
+            if (!startStr || !endStr) return alert("Seleccione ambas fechas.");
+            
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
 
-                // Parseo de fecha DD/MM/YYYY
-                const parts = fechaStr.split('/');
-                const date = new Date(parts[2], parts[1] - 1, parts[0]);
+            filteredData = rawData.filter(row => {
+                const rowDateStr = row['FECHA DE PUBLICACIÓN'];
+                if (!rowDateStr) return false;
                 
-                if(isNaN(date.getTime())) return;
-
-                const rowMonth = date.getMonth();
-                const rowYear = date.getFullYear();
-
-                // Conteo mensual
-                if(rowMonth === currentMonth && rowYear === currentYear) countMesActual++;
-                if(rowMonth === (currentMonth - 1 === -1 ? 11 : currentMonth - 1)) {
-                   if(rowYear === (currentMonth === 0 ? currentYear - 1 : currentYear)) countMesPasado++;
-                }
-
-                // Urgencia
-                if(row['URGENCIA'] === 'ALTA') urgenciaAlta++;
-
-                // Agrupar para gráfico
-                const key = date.toISOString().split('T')[0];
-                timeline[key] = (timeline[key] || 0) + 1;
+                const parts = rowDateStr.split('/');
+                if (parts.length !== 3) return false;
+                
+                const rowDate = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                return rowDate >= startDate && rowDate <= endDate;
             });
 
-            // Actualizar UI
-            document.getElementById('total-mes').innerText = countMesActual;
-            document.getElementById('total-pasado').innerText = countMesPasado;
-            document.getElementById('urgencia-total').innerText = urgenciaAlta;
-
-            // Comparativo
-            const diff = countMesActual - countMesPasado;
-            const perc = countMesPasado > 0 ? (diff / countMesPasado * 100).toFixed(1) : 100;
-            const compEl = document.getElementById('comparativo-val');
-            compEl.innerText = `${diff >= 0 ? '+' : ''}${perc}%`;
-            compEl.className = diff >= 0 ? 'bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-sm font-bold' : 'bg-red-500/20 text-red-400 px-2 py-1 rounded text-sm font-bold';
-
-            renderChart(timeline);
+            // Actualizar KPI y Gráficos
+            updateDashboard();
         }
 
-        function renderChart(timelineData) {
-            const labels = Object.keys(timelineData).sort();
-            const values = labels.map(l => timelineData[l]);
+        // --- Actualización de KPI y Gráficos ---
+        function updateDashboard() {
+            // 0. KPI Principal
+            document.getElementById('kpi-total-menciones').innerText = filteredData.length;
 
-            const ctx = document.getElementById('mencionesChart').getContext('2d');
-            new Chart(ctx, {
+            // Limpiar gráficos anteriores para evitar superposiciones
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
+            // 1. Gráficos de VISTA GENERAL
+            createGeneralCharts();
+
+            // 2. Gráficos de VISTA SEMÁFORO
+            createSemaforoCharts();
+
+            // 3. Gráficos de VISTA AHORRO
+            updateAhorroView();
+        }
+
+        // --- Procesamiento de Datos para Gráficos (Helpers) ---
+        
+        // Agrupar por fecha y contar
+        function getMencionesPorFecha(data) {
+            let counts = {};
+            data.forEach(row => {
+                const date = row['FECHA DE PUBLICACIÓN'];
+                if (date) counts[date] = (counts[date] || 0) + 1;
+            });
+            // Ordenar por fecha (simple sort ya que el CSV parece ordenado DD/MM)
+            const sortedLabels = Object.keys(counts).sort((a,b) => {
+                const aParts = a.split('/'); const bParts = b.split('/');
+                return new Date(aParts[2], aParts[1]-1, aParts[0]) - new Date(bParts[2], bParts[1]-1, bParts[0]);
+            });
+            const values = sortedLabels.map(label => counts[label]);
+            return { labels: sortedLabels, values: values };
+        }
+
+        // Agrupar por columna y contar
+        function getDistribucionPorColumna(data, columnName) {
+            let counts = {};
+            data.forEach(row => {
+                const value = row[columnName];
+                if (value) counts[value] = (counts[value] || 0) + 1;
+            });
+            // Convertir a objeto para gráfico de barras horizontales (ordenado por frecuencia)
+            return Object.entries(counts)
+                .sort((a, b) => b[1] - a[1]) // Mayor a menor
+                .reduce((obj, [key, val]) => {
+                    obj[key] = val;
+                    return obj;
+                }, {});
+        }
+
+        // Helper para barras segmentadas (Semaforo)
+        function getSemaforoStackData(data, categoryCol, sentimentCol) {
+            let categories = [];
+            let datasetMap = { 'Positiva': [], 'Neutro': [], 'Negativa': [] };
+
+            // Obtener categorías únicas y ordenadas
+            categories = [...new Set(data.map(r => r[categoryCol]))].filter(Boolean).sort();
+
+            categories.forEach(cat => {
+                datasetMap['Positiva'].push(data.filter(r => r[categoryCol] === cat && r[sentimentCol] === 'Positiva').length);
+                datasetMap['Neutro'].push(data.filter(r => r[categoryCol] === cat && r[sentimentCol] === 'Neutro').length);
+                datasetMap['Negativa'].push(data.filter(r => r[categoryCol] === cat && r[sentimentCol] === 'Negativa').length);
+            });
+
+            return { labels: categories, datasets: datasetMap };
+        }
+
+        // --- Creación de Gráficos Específicos ---
+
+        function createGeneralCharts() {
+            // Linea Tiempo
+            const timeData = getMencionesPorFecha(filteredData);
+            charts.generalTime = new Chart(document.getElementById('chart-menciones-tiempo-general'), {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels: timeData.labels,
                     datasets: [{
-                        label: 'Menciones Diarias',
-                        data: values,
-                        borderColor: '#60a5fa',
-                        borderWidth: 4,
-                        pointBackgroundColor: '#60a5fa',
-                        pointRadius: 4,
-                        tension: 0.4,
+                        data: timeData.values,
+                        borderColor: blueScale[1],
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
                         fill: true,
-                        backgroundColor: 'rgba(96, 165, 250, 0.1)'
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: blueScale[1]
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            grid: { color: '#334155' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)'}, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+            });
+
+            // Origen Bar Horiz
+            const origData = getDistribucionPorColumna(filteredData, 'ORIGEN DEL POSICIONAMIENTO');
+            charts.generalOrig = new Chart(document.getElementById('chart-origen-general'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(origData),
+                    datasets: [{ data: Object.values(origData), backgroundColor: blueScale[2] }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#94a3b8', font: {size: 10} } }, x: { ticks: { color: '#94a3b8' } } } }
+            });
+
+            // Tematica Bar Horiz
+            const tematData = getDistribucionPorColumna(filteredData, 'TEMA');
+            charts.generalTemat = new Chart(document.getElementById('chart-tematica-general'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(tematData),
+                    datasets: [{ data: Object.values(tematData), backgroundColor: blueScale[3] }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } }
+            });
+
+            // Pie Medio
+            const medioData = getDistribucionPorColumna(filteredData, 'TIPO DE MEDIO');
+            charts.generalPieMedio = new Chart(document.getElementById('chart-tipo-medio-general'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(medioData),
+                    datasets: [{ data: Object.values(medioData), backgroundColor: blueScale }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } }
+            });
+
+            // Pie Protagonista
+            const protagonistData = getDistribucionPorColumna(filteredData, '¿DE QUIÉN SE HABLA? / PROTAGONISTA');
+            charts.generalPieProt = new Chart(document.getElementById('chart-protagonista-general'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(protagonistData),
+                    datasets: [{ data: Object.values(protagonistData), backgroundColor: blueScale }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } }
             });
         }
 
+        function createSemaforoCharts() {
+            // Linea Tiempo (Múltiples líneas)
+            let countsByDate = { 'Positiva': {}, 'Neutro': {}, 'Negativa': {} };
+            filteredData.forEach(row => {
+                const date = row['FECHA DE PUBLICACIÓN'];
+                const sent = row['CRITERIO DE IMAGEN'];
+                if(date && sent && countsByDate[sent]) {
+                    countsByDate[sent][date] = (countsByDate[sent][date] || 0) + 1;
+                }
+            });
+            // Ordenar etiquetas de fecha
+            const sortedLabels = [...new Set(filteredData.map(r => r['FECHA DE PUBLICACIÓN']).filter(Boolean))].sort((a,b) => {
+                const aParts = a.split('/'); const bParts = b.split('/');
+                return new Date(aParts[2], aParts[1]-1, aParts[0]) - new Date(bParts[2], bParts[1]-1, bParts[0]);
+            });
+
+            const datasets = Object.keys(semaforoColors).map(sent => {
+                const values = sortedLabels.map(label => countsByDate[sent][label] || 0);
+                return {
+                    label: sent,
+                    data: values,
+                    borderColor: semaforoColors[sent],
+                    tension: 0.3, pointRadius: 2, fill: false
+                };
+            });
+
+            charts.semaforoTime = new Chart(document.getElementById('chart-menciones-tiempo-semaforo'), {
+                type: 'line',
+                data: { labels: sortedLabels, datasets: datasets },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8'} } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)'}, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+            });
+
+            // Pie Criterio Total
+            const criterioData = getDistribucionPorColumna(filteredData, 'CRITERIO DE IMAGEN');
+            charts.semaforoPie = new Chart(document.getElementById('chart-criterio-general-semaforo'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(criterioData),
+                    datasets: [{
+                        data: Object.values(criterioData),
+                        backgroundColor: Object.keys(criterioData).map(label => semaforoColors[label] || '#94a3b8')
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } }
+            });
+
+            // Barras Segmentadas Medio
+            const stackMedio = getSemaforoStackData(filteredData, 'TIPO DE MEDIO', 'CRITERIO DE IMAGEN');
+            charts.semaforoBarMedio = new Chart(document.getElementById('chart-bar-medio-semaforo'), {
+                type: 'bar',
+                data: {
+                    labels: stackMedio.labels,
+                    datasets: Object.keys(semaforoColors).map(sent => ({
+                        label: sent, data: stackMedio.datasets[sent], backgroundColor: semaforoColors[sent]
+                    }))
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: {color: '#94a3b8'}}, y: { stacked: true, ticks: {color: '#94a3b8'}}} }
+            });
+
+            // Barras Segmentadas Protagonista
+            const stackProt = getSemaforoStackData(filteredData, '¿DE QUIÉN SE HABLA? / PROTAGONISTA', 'CRITERIO DE IMAGEN');
+            charts.semaforoBarProt = new Chart(document.getElementById('chart-bar-protagonista-semaforo'), {
+                type: 'bar',
+                data: {
+                    labels: stackProt.labels,
+                    datasets: Object.keys(semaforoColors).map(sent => ({
+                        label: sent, data: stackProt.datasets[sent], backgroundColor: semaforoColors[sent]
+                    }))
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: {color: '#94a3b8'}}, y: { stacked: true, ticks: {color: '#94a3b8'}}} }
+            });
+        }
+
+        function updateAhorroView() {
+            // Calcular sumas de las columnas USD y Soles
+            let totalSoles = 0;
+            let totalUSD = 0;
+
+            filteredData.forEach(row => {
+                // Limpiar los valores (pueden venir con coma, espacio, etc.)
+                const solValStr = (row['Soles'] || '').replace('S/', '').replace(',', '').trim();
+                const usdValStr = (row['USD'] || '').replace(',', '').trim();
+
+                const solVal = parseFloat(solValStr);
+                const usdVal = parseFloat(usdValStr);
+
+                if(!isNaN(solVal)) totalSoles += solVal;
+                if(!isNaN(usdVal)) totalUSD += usdVal;
+            });
+
+            // Actualizar UI con formato de moneda simple
+            document.getElementById('saving-value-soles').innerText = totalSoles.toLocaleString('es-PE', { style: 'currency', currency: 'PEN' });
+            document.getElementById('saving-value-usd').innerText = totalUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        }
+
+        // Ejecutar carga inicial
         init();
+
     </script>
 </body>
 </html>
