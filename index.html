@@ -78,13 +78,13 @@
         .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PAGINA 1: Vista General (Grid 3 columnas, incluye KPI total) */
+        /* PAGINA 1: Vista General (Ajustado para devolver todos los gráficos) */
         #view-general {
-            grid-template-columns: 220px 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 1fr 1fr;
             grid-template-areas: 
                 "kpi time pie"
-                "kpi temat orig";
+                "prot temat orig";
         }
 
         /* PAGINA 2: Semáforo (Grid 3 columnas) */
@@ -120,7 +120,7 @@
         /* ASIGNACIÓN DE ÁREAS */
         .box-kpi-g { grid-area: kpi; display: flex; flex-direction: column;}
         .box-time { grid-area: time; } .box-orig { grid-area: orig; }
-        .box-temat { grid-area: temat; } .box-pie { grid-area: pie; }
+        .box-temat { grid-area: temat; } .box-pie { grid-area: pie; } .box-prot { grid-area: prot; }
         
         .box-time-s { grid-area: time-s; } .box-pie-s { grid-area: pie-s; }
         .box-prot-s { grid-area: prot-s; } .box-med-s { grid-area: med-s; }
@@ -129,7 +129,7 @@
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 12px;}
         .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 12px;}
 
-        /* ESTILOS DE LOS KPI (Total y Ahorro) */
+        /* ESTILOS DE LOS KPI */
         .kpi-box { 
             text-align: center; color: white; padding: 25px; border-radius: var(--radius); flex: 1; 
             display:flex; flex-direction:column; justify-content:center;
@@ -185,6 +185,12 @@
             <h3>Tipo de Medio (Número y %)</h3>
             <div class="chart-container"><canvas id="c-medio"></canvas></div>
         </div>
+        
+        <div class="chart-card box-prot">
+            <h3>Top Protagonistas</h3>
+            <div class="chart-container"><canvas id="c-prot"></canvas></div>
+        </div>
+        
         <div class="chart-card box-temat">
             <h3>Temática (Top 10)</h3>
             <div class="chart-container"><canvas id="c-temat"></canvas></div>
@@ -245,7 +251,7 @@
         Chart.defaults.font.family = "'Inter', sans-serif";
 
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
-        const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb' };
+        const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb', sky: '#60a5fa' };
         const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
         
         let rawData = [], filteredData = [], charts = {};
@@ -309,11 +315,9 @@
             
             if(!startVal || !endVal) return;
 
-            // Cortar strings manualmente para evitar problema de zona horaria de JS
             const s = startVal.split('-');
             const e = endVal.split('-');
             
-            // Forzar fechas a medianoche local, y al último segundo del día final
             const start = new Date(s[0], s[1]-1, s[2]);
             const end = new Date(e[0], e[1]-1, e[2], 23, 59, 59);
             
@@ -414,19 +418,27 @@
                 }
             });
 
-            // 2. Origen (Top 10)
-            const orig = groupData('ORIGEN').slice(0, 10);
-            charts.p1Orig = new Chart(document.getElementById('c-orig'), {
+            // 2. Tipo Medio
+            const med = groupData('TIPO DE MEDIO');
+            charts.p1Medio = new Chart(document.getElementById('c-medio'), {
+                type: 'doughnut',
+                data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:11, family:'Inter'}}}, datalabels: pieLabelsConfig } }
+            });
+
+            // 3. Protagonistas (GRÁFICO RESTAURADO)
+            const prot = groupData('QUIÉN').slice(0, 10);
+            charts.p1Prot = new Chart(document.getElementById('c-prot'), {
                 type: 'bar',
-                data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                data: { labels: prot.map(x=>x[0]), datasets: [{ data: prot.map(x=>x[1]), backgroundColor: colors.sky, borderRadius: 4 }] },
                 options: { 
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
-                    plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, 
+                    plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.sky} }, 
                     layout:{padding:{right:60}}, scales: { x:{display:false}, y:{grid:{display:false}} } 
                 }
             });
 
-            // 3. Temática (Top 10)
+            // 4. Temática (Top 10)
             const temat = groupData('TEMA').slice(0, 10);
             charts.p1Temat = new Chart(document.getElementById('c-temat'), {
                 type: 'bar',
@@ -438,12 +450,16 @@
                 }
             });
 
-            // 4. Tipo Medio
-            const med = groupData('TIPO DE MEDIO');
-            charts.p1Medio = new Chart(document.getElementById('c-medio'), {
-                type: 'doughnut',
-                data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:11, family:'Inter'}}}, datalabels: pieLabelsConfig } }
+            // 5. Origen (Top 10)
+            const orig = groupData('ORIGEN').slice(0, 10);
+            charts.p1Orig = new Chart(document.getElementById('c-orig'), {
+                type: 'bar',
+                data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 4 }] },
+                options: { 
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, 
+                    layout:{padding:{right:60}}, scales: { x:{display:false}, y:{grid:{display:false}} } 
+                }
             });
         }
 
@@ -556,7 +572,7 @@
         }
 
         // ==========================================
-        // PÁGINA 3: AHORRO (Solo Positivas, Columna "Soles")
+        // PÁGINA 3: AHORRO 
         // ==========================================
         function renderPagina3() {
             let totalS = 0;
