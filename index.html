@@ -54,9 +54,14 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
-        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900;
+        
+        /* ESTILOS NUEVOS PARA EL LOGO Y TEXTOS */
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .logo-mml { height: 42px; width: auto; object-fit: contain; }
+        .header-left-texts { display: flex; flex-direction: column; }
+        .header-left-texts h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900;
         letter-spacing: -0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
-        .header-left p { margin: 2px 0 0 0;
+        .header-left-texts p { margin: 2px 0 0 0;
         font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
         
         .nav-buttons { display: flex;
@@ -223,9 +228,14 @@
 
     <header>
         <div class="header-left">
-            <h1><i class="ph-fill ph-chart-line-up"></i> Panel de Monitoreo</h1>
-            <p>MUNICIPALIDAD METROPOLITANA DE LIMA</p>
+            <img src="images.png" alt="Logo Municipalidad de Lima" class="logo-mml">
+            
+            <div class="header-left-texts">
+                <h1><i class="ph-fill ph-chart-line-up"></i> Panel de Monitoreo</h1>
+                <p>MUNICIPALIDAD METROPOLITANA DE LIMA</p>
+            </div>
         </div>
+        
         <div class="nav-buttons">
             <button class="nav-btn active" onclick="switchView('general')"><i class="ph ph-squares-four"></i> General</button>
             <button class="nav-btn" onclick="switchView('semaforo')"><i class="ph ph-traffic-signal"></i> Semáforo</button>
