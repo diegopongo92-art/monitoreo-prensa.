@@ -23,7 +23,7 @@
             --border: #e2e8f0;
             --pos: #10b981; 
             --neu: #f59e0b; 
-            --neg: #ef4444; 
+            --neg: #ef4444;
             /* Sombras Flat 2.0 */
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
             --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
@@ -34,7 +34,8 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { 
-            margin: 0; padding: 12px; 
+            margin: 0;
+            padding: 12px; 
             background-color: var(--bg-color); color: var(--text-dark);
             height: 100vh; overflow: hidden; 
             display: flex; flex-direction: column;
@@ -42,50 +43,66 @@
 
         /* HEADER Y FILTROS */
         header { 
-            display: flex; justify-content: space-between; align-items: center; 
+            display: flex;
+            justify-content: space-between; align-items: center; 
             padding: 12px 20px; margin-bottom: 12px;
             background: var(--card-bg); border-radius: var(--radius); 
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
-        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900; letter-spacing: -0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
-        .header-left p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
+        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900;
+        letter-spacing: -0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
+        .header-left p { margin: 2px 0 0 0;
+        font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
         
-        .nav-buttons { display: flex; gap: 8px; background: var(--bg-color); padding: 5px; border-radius: 10px; border: 1px solid var(--border); }
+        .nav-buttons { display: flex;
+        gap: 8px; background: var(--bg-color); padding: 5px; border-radius: 10px; border: 1px solid var(--border);
+        }
         .nav-btn {
-            background: transparent; border: none; color: var(--text-muted);
+            background: transparent;
+            border: none; color: var(--text-muted);
             padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
-            display: flex; align-items: center; gap: 6px;
+            display: flex; align-items: center;
+            gap: 6px;
             transition: all 0.2s ease;
         }
         .nav-btn i { font-size: 16px; }
-        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 700;}
+        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm);
+        font-weight: 700;}
         .nav-btn:hover:not(.active) { color: var(--text-dark); background: rgba(0,0,0,0.02); }
         
-        .filters { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
+        .filters { display: flex;
+        gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
         
         select {
-            padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; 
+            padding: 8px 12px;
+            border: 1px solid var(--border); border-radius: 8px; 
             font-size: 13px; color: var(--text-dark); font-weight: 600; outline: none;
-            background-color: white; cursor: pointer; transition: border-color 0.2s;
+            background-color: white; cursor: pointer;
+            transition: border-color 0.2s;
         }
         select:focus { border-color: var(--primary-light); }
         
         .btn-apply { 
-            background: var(--primary); color: white; border: none; padding: 8px 16px; 
+            background: var(--primary);
+            color: white; border: none; padding: 8px 16px; 
             border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
-            display: flex; align-items: center; gap: 6px;
+            display: flex;
+            align-items: center; gap: 6px;
             transition: background 0.2s, transform 0.1s; 
         }
-        .btn-apply:hover { background: var(--primary-light); transform: translateY(-1px); }
+        .btn-apply:hover { background: var(--primary-light);
+        transform: translateY(-1px); }
 
         /* VISTAS Y GRIDS */
         .dashboard-view { 
-            display: none; flex: 1; height: calc(100vh - 85px); 
+            display: none;
+            flex: 1; height: calc(100vh - 85px); 
             gap: 16px; padding-bottom: 5px;
         }
         .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);
+        } to { opacity: 1; transform: translateY(0); } }
 
         /* PAGINA 1: Vista General */
         #view-general {
@@ -114,20 +131,22 @@
 
         /* TARJETAS DE GRÁFICOS - ESTILO PREMIUM */
         .chart-card {
-            background: var(--card-bg); 
+            background: var(--card-bg);
             border-radius: var(--radius); 
             border: 1px solid var(--border);
             padding: 16px 20px; 
             position: relative; display: flex; flex-direction: column;
-            box-shadow: var(--shadow-md); 
+            box-shadow: var(--shadow-md);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-height: 0; /* CORRECCIÓN APLICADA AQUÍ */
         }
         .chart-card:hover { 
-            box-shadow: var(--shadow-hover); 
+            box-shadow: var(--shadow-hover);
             transform: translateY(-2px); 
         }
         .chart-card h3 { 
-            margin: 0 0 12px 0; font-size: 13px; color: var(--text-muted); 
+            margin: 0 0 12px 0;
+            font-size: 13px; color: var(--text-muted); 
             font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
             display: flex; align-items: center; gap: 6px;
         }
@@ -144,18 +163,20 @@
         .box-top-neg { grid-area: top-neg; }
 
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 16px;}
-        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 16px;}
+        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: calc(50% - 8px) calc(50% - 8px); gap: 16px;} /* CORRECCIÓN APLICADA AQUÍ */
 
         /* ESTILOS DE LOS KPI */
         .kpi-box { 
-            text-align: center; color: white; padding: 20px; border-radius: var(--radius); flex: 1; 
+            text-align: center;
+            color: white; padding: 20px; border-radius: var(--radius); flex: 1; 
             display:flex; flex-direction:column; justify-content:center; align-items: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             box-shadow: var(--shadow-md);
             position: relative; overflow: hidden;
         }
         .kpi-bg-icon {
-            position: absolute; right: -20px; bottom: -20px;
+            position: absolute;
+            right: -20px; bottom: -20px;
             font-size: 140px; opacity: 0.08; color: #fff;
             pointer-events: none;
         }
@@ -163,8 +184,10 @@
         .kpi-box h2 { margin: 0; font-size: 46px; font-weight: 900; letter-spacing: -1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;}
         
         .trend-badge {
-            margin-top: 12px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
-            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;
+            margin-top: 12px;
+            padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1;
         }
         .trend-badge.up { background-color: #dcfce7; color: #166534; }
         .trend-badge.down { background-color: #fee2e2; color: #991b1b; }
@@ -173,12 +196,15 @@
 
         /* LOADING SPINNER */
         #loading { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-            background: rgba(248, 250, 252, 0.9); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(248, 250, 252, 0.9); z-index: 999; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; 
             color: var(--primary); font-weight: 800; font-size: 18px; backdrop-filter: blur(8px); gap: 15px;
         }
         .spinner {
-            width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); 
+            width: 40px;
+            height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); 
             border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -308,7 +334,6 @@
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
         const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb', sky: '#60a5fa' };
         const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-        
         let rawData = [], filteredData = [], prevData = [], charts = {};
 
         Papa.parse(CSV_URL, {
@@ -360,10 +385,9 @@
             
             const start = new Date(currentYear, selectedMonth, 1);
             const end = new Date(currentYear, selectedMonth + 1, 0, 23, 59, 59);
-            
             const prevStart = new Date(currentYear, selectedMonth - 1, 1);
             const prevEnd = new Date(currentYear, selectedMonth, 0, 23, 59, 59);
-            
+
             filteredData = rawData.filter(row => {
                 const f = getCol(row, 'FECHA');
                 if(!f) return false;
@@ -432,6 +456,7 @@
                 return `${val} (${(val*100/sum).toFixed(1)}%)`;
             }
         };
+
         const pieLabelsConfig = {
             color: '#fff', font: { weight: 'bold', size: 13 },
             textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.4)',
@@ -440,9 +465,11 @@
                 return `${val}\n(${(val*100/sum).toFixed(1)}%)`;
             }
         };
+
         const scaleAxesConfig = {
             ticks: { font: { size: 12, weight: '500' }, color: '#64748b' } 
         };
+
         const tooltipConfig = {
             enabled: true, titleFont: { size: 14, family:'Inter' }, bodyFont: { size: 13, family:'Inter' }, padding: 12,
             backgroundColor: 'rgba(15, 23, 42, 0.9)', cornerRadius: 8
@@ -474,7 +501,7 @@
             const ctxTime = document.getElementById('c-time').getContext('2d');
             const gradientTime = ctxTime.createLinearGradient(0, 0, 0, 300);
             gradientTime.addColorStop(0, colors.mainLight + '60'); 
-            gradientTime.addColorStop(1, colors.mainLight + '00'); 
+            gradientTime.addColorStop(1, colors.mainLight + '00');
 
             charts.p1Time = new Chart(document.getElementById('c-time'), {
                 type: 'line',
@@ -523,7 +550,7 @@
         function renderPagina2() {
             const sentCount = { 'Positiva':0, 'Neutro':0, 'Negativa':0 };
             const timeSem = { 'Positiva':{}, 'Neutro':{}, 'Negativa':{} };
-            const medNeg = {}; 
+            const medNeg = {};
 
             filteredData.forEach(r => {
                 const s = determineSentiment(getCol(r, 'CRITERIO'));
@@ -538,6 +565,7 @@
             });
 
             const allDates = [...new Set(filteredData.map(r=>getCol(r,'FECHA')).filter(Boolean))].sort((a,b)=>{const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]);});
+
             charts.p2Time = new Chart(document.getElementById('c-time-sem'), {
                 type: 'line',
                 data: {
@@ -639,7 +667,7 @@
                 type: 'bar',
                 data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 6 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: {...moneyLabelConf, color: colors.mainLight}}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
-            });
+             });
         }
     </script>
 </body>
