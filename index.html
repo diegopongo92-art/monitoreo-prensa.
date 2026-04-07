@@ -14,12 +14,12 @@
     <style>
         /* TEMA MODERNO - PREMIUM UI */
         :root {
-            --bg-color: #f8fafc; /* Fondo un poco más claro y limpio */
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --primary: #002f80;
             --primary-light: #2563eb;
             --text-dark: #0f172a;
-            --text-muted: #64748b; /* Gris más suave para títulos */
+            --text-muted: #64748b;
             --border: #e2e8f0;
             --pos: #10b981; 
             --neu: #f59e0b; 
@@ -28,7 +28,7 @@
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
             --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 10px 25px -5px rgba(0, 47, 128, 0.08);
-            --radius: 16px; /* Bordes más redondeados y amigables */
+            --radius: 16px;
         }
 
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -152,7 +152,7 @@
             display:flex; flex-direction:column; justify-content:center; align-items: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             box-shadow: var(--shadow-md);
-            position: relative; overflow: hidden; /* Para la marca de agua */
+            position: relative; overflow: hidden;
         }
         .kpi-bg-icon {
             position: absolute; right: -20px; bottom: -20px;
@@ -473,17 +473,18 @@
             // Creación del degradado para la gráfica de línea
             const ctxTime = document.getElementById('c-time').getContext('2d');
             const gradientTime = ctxTime.createLinearGradient(0, 0, 0, 300);
-            gradientTime.addColorStop(0, colors.mainLight + '60'); // Azul semi-transparente arriba
-            gradientTime.addColorStop(1, colors.mainLight + '00'); // Transparente abajo
+            gradientTime.addColorStop(0, colors.mainLight + '60'); 
+            gradientTime.addColorStop(1, colors.mainLight + '00'); 
 
             charts.p1Time = new Chart(document.getElementById('c-time'), {
                 type: 'line',
                 data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: gradientTime, fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: colors.main, pointBorderWidth: 2 }] },
                 options: { 
+                    layout: { padding: { top: 20 } },
                     interaction: { mode: 'index', intersect: false }, 
                     responsive: true, maintainAspectRatio: false, 
                     plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '700', size: 12 } } }, 
-                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                    scales: { y: { beginAtZero: true, grace: '15%', grid: { borderDash: [4, 4], color: '#f1f5f9' }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
                 }
             });
 
@@ -491,7 +492,7 @@
             charts.p1Medio = new Chart(document.getElementById('c-medio'), {
                 type: 'doughnut',
                 data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 2, borderColor: '#fff' }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { tooltip: tooltipConfig, legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:12, family:'Inter'}}}, datalabels: pieLabelsConfig } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '45%', plugins: { tooltip: tooltipConfig, legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:12, family:'Inter'}}}, datalabels: pieLabelsConfig } }
             });
 
             const prot = groupData('QUIÉN').slice(0, 10);
