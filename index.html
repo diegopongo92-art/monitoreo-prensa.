@@ -6,11 +6,7 @@
     <title>Dashboard MML - Monitoreo de Medios</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
-    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -28,6 +24,7 @@
             --pos: #10b981; 
             --neu: #f59e0b; 
             --neg: #ef4444;
+            /* Sombras Flat 2.0 */
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
             --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 10px 25px -5px rgba(0, 47, 128, 0.08);
@@ -53,48 +50,104 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
         }
-        
-        .header-left { display: flex; align-items: center; gap: 14px; }
-        .logo-mml { height: 42px; width: auto; object-fit: contain; }
-        .header-left-texts { display: flex; flex-direction: column; }
-        .header-left-texts h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900;
+        .header-left h1 { margin: 0; font-size: 19px; color: var(--primary); font-weight: 900;
         letter-spacing: -0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;}
-        .header-left-texts p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
+        .header-left p { margin: 2px 0 0 0;
+        font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px;}
         
-        .nav-buttons { display: flex; gap: 8px; background: var(--bg-color); padding: 5px; border-radius: 10px; border: 1px solid var(--border); }
-        .nav-btn { background: transparent; border: none; color: var(--text-muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+        .nav-buttons { display: flex;
+        gap: 8px; background: var(--bg-color); padding: 5px; border-radius: 10px; border: 1px solid var(--border);
+        }
+        .nav-btn {
+            background: transparent;
+            border: none; color: var(--text-muted);
+            padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
         .nav-btn i { font-size: 16px; }
-        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 700;}
+        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: var(--shadow-sm);
+        font-weight: 700;}
         .nav-btn:hover:not(.active) { color: var(--text-dark); background: rgba(0,0,0,0.02); }
         
-        .filters { display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
+        .filters { display: flex;
+        gap: 10px; align-items: center; font-size: 13px; font-weight: 600;}
         
         select {
-            padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; 
+            padding: 8px 12px;
+            border: 1px solid var(--border); border-radius: 8px; 
             font-size: 13px; color: var(--text-dark); font-weight: 600; outline: none;
-            background-color: white; cursor: pointer; transition: border-color 0.2s;
+            background-color: white; cursor: pointer;
+            transition: border-color 0.2s;
         }
         select:focus { border-color: var(--primary-light); }
+        
+        .btn-apply { 
+            background: var(--primary);
+            color: white; border: none; padding: 8px 16px; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
+            display: flex;
+            align-items: center; gap: 6px;
+            transition: background 0.2s, transform 0.1s; 
+        }
+        .btn-apply:hover { background: var(--primary-light);
+        transform: translateY(-1px); }
 
         /* VISTAS Y GRIDS */
-        .dashboard-view { display: none; flex: 1; height: calc(100vh - 85px); gap: 16px; padding-bottom: 5px; }
+        .dashboard-view { 
+            display: none;
+            flex: 1; height: calc(100vh - 85px); 
+            gap: 16px; padding-bottom: 5px;
+        }
         .dashboard-view.active { display: grid; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PÁGINAS (GRIDS DE PC) */
-        #view-general { grid-template-columns: repeat(12, 1fr); grid-template-rows: 38% calc(62% - 16px); grid-template-areas: "kpi kpi time time time time time time time pie pie pie" "prot prot prot prot temat temat temat temat orig orig orig orig"; }
-        #view-semaforo { grid-template-columns: repeat(12, 1fr); grid-template-rows: 45% calc(55% - 16px); grid-template-areas: "time-s time-s time-s time-s time-s time-s time-s time-s pie-s pie-s pie-s pie-s" "top-neg top-neg top-neg top-neg prot-s prot-s prot-s prot-s med-s med-s med-s med-s"; }
-        #view-ahorro { grid-template-columns: 25% calc(75% - 16px); grid-template-rows: 100%; grid-template-areas: "kpi bars"; }
-
-        /* TARJETAS DE GRÁFICOS */
-        .chart-card {
-            background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--border);
-            padding: 16px 20px; position: relative; display: flex; flex-direction: column;
-            box-shadow: var(--shadow-md); transition: transform 0.2s ease, box-shadow 0.2s ease;
-            min-height: 0;
+        /* PAGINA 1: Vista General */
+        #view-general {
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 38% calc(62% - 16px);
+            grid-template-areas: 
+                "kpi kpi time time time time time time time pie pie pie"
+                "prot prot prot prot temat temat temat temat orig orig orig orig";
         }
-        .chart-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
-        .chart-card h3 { margin: 0 0 12px 0; font-size: 13px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
+
+        /* PAGINA 2: Semáforo */
+        #view-semaforo {
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 45% calc(55% - 16px);
+            grid-template-areas: 
+                "time-s time-s time-s time-s time-s time-s time-s time-s pie-s pie-s pie-s pie-s"
+                "top-neg top-neg top-neg top-neg prot-s prot-s prot-s prot-s med-s med-s med-s med-s";
+        }
+
+        /* PAGINA 3: Ahorro */
+        #view-ahorro {
+            grid-template-columns: 25% calc(75% - 16px);
+            grid-template-rows: 100%;
+            grid-template-areas: "kpi bars";
+        }
+
+        /* TARJETAS DE GRÁFICOS - ESTILO PREMIUM */
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: var(--radius); 
+            border: 1px solid var(--border);
+            padding: 16px 20px; 
+            position: relative; display: flex; flex-direction: column;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .chart-card:hover { 
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px); 
+        }
+        .chart-card h3 { 
+            margin: 0 0 12px 0;
+            font-size: 13px; color: var(--text-muted); 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 6px;
+        }
         .chart-container { flex: 1; position: relative; min-height: 0; }
         canvas { width: 100% !important; height: 100% !important; }
 
@@ -102,26 +155,37 @@
         .box-kpi-g { grid-area: kpi; display: flex; flex-direction: column;}
         .box-time { grid-area: time; } .box-orig { grid-area: orig; }
         .box-temat { grid-area: temat; } .box-pie { grid-area: pie; } .box-prot { grid-area: prot; }
+        
         .box-time-s { grid-area: time-s; } .box-pie-s { grid-area: pie-s; }
         .box-prot-s { grid-area: prot-s; } .box-med-s { grid-area: med-s; }
         .box-top-neg { grid-area: top-neg; }
+
         .box-kpi-a { grid-area: kpi; display: flex; flex-direction: column; gap: 16px;}
-        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: calc(50% - 8px) calc(50% - 8px); gap: 16px;}
+        .box-bars-a { grid-area: bars; display: grid; grid-template-rows: 1fr 1fr; gap: 16px;}
 
         /* ESTILOS DE LOS KPI */
         .kpi-box { 
-            text-align: center; color: white; padding: 20px; border-radius: var(--radius); flex: 1; 
+            text-align: center;
+            color: white; padding: 20px; border-radius: var(--radius); flex: 1; 
             display:flex; flex-direction:column; justify-content:center; align-items: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+            box-shadow: var(--shadow-md);
+            position: relative; overflow: hidden;
         }
-        .kpi-bg-icon { position: absolute; right: -20px; bottom: -20px; font-size: 140px; opacity: 0.08; color: #fff; pointer-events: none; }
+        .kpi-bg-icon {
+            position: absolute;
+            right: -20px; bottom: -20px;
+            font-size: 140px; opacity: 0.08; color: #fff;
+            pointer-events: none;
+        }
         .kpi-box h4 { margin: 0 0 8px 0; font-size: 13px; font-weight: 600; opacity: 0.9; letter-spacing: 1px; z-index: 1;}
         .kpi-box h2 { margin: 0; font-size: 46px; font-weight: 900; letter-spacing: -1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;}
         
         .trend-badge {
-            margin-top: 12px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
-            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1;
+            margin-top: 12px;
+            padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1;
         }
         .trend-badge.up { background-color: #dcfce7; color: #166534; }
         .trend-badge.down { background-color: #fee2e2; color: #991b1b; }
@@ -130,37 +194,18 @@
 
         /* LOADING SPINNER */
         #loading { 
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0; 
             background: rgba(248, 250, 252, 0.9); z-index: 999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; color: var(--primary); font-weight: 800; font-size: 18px; backdrop-filter: blur(8px); gap: 15px;
+            align-items: center; justify-content: center; 
+            color: var(--primary); font-weight: 800; font-size: 18px; backdrop-filter: blur(8px); gap: 15px;
         }
-        .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner {
+            width: 40px;
+            height: 40px; border: 4px solid var(--border); border-top-color: var(--primary); 
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ADAPTACIÓN PARA MÓVILES */
-        @media (max-width: 860px) {
-            body { height: auto; overflow-y: auto; padding: 10px; }
-            header { flex-direction: column; gap: 16px; text-align: center; height: auto; }
-            .header-left { flex-direction: column; gap: 10px; }
-            .header-left-texts h1 { justify-content: center; font-size: 17px; }
-            .nav-buttons { width: 100%; flex-wrap: wrap; justify-content: center; }
-            .nav-btn { flex: 1; justify-content: center; min-width: 100px; }
-            .filters { width: 100%; justify-content: center; }
-            .filters select { flex: 1; max-width: 250px; }
-            .dashboard-view { height: auto; overflow: visible; }
-            .dashboard-view.active { display: flex; flex-direction: column; gap: 20px; }
-            .chart-card { height: auto; }
-
-            /* Alturas según tipo de gráfico */
-            .box-prot .chart-container, .box-temat .chart-container, .box-orig .chart-container,
-            .box-top-neg .chart-container, .box-prot-s .chart-container, .box-med-s .chart-container { min-height: 450px; }
-            .box-pie .chart-container, .box-pie-s .chart-container { min-height: 320px; }
-            .box-time .chart-container, .box-time-s .chart-container { min-height: 280px; }
-            #view-ahorro .chart-card .chart-container { min-height: 350px; }
-            .box-bars-a { display: flex; flex-direction: column; gap: 20px; }
-            .kpi-box { padding: 30px 20px; }
-            .kpi-box h2 { font-size: 38px; }
-        }
     </style>
 </head>
 <body>
@@ -172,20 +217,18 @@
 
     <header>
         <div class="header-left">
-            <img src="images.png" alt="Logo MML" class="logo-mml">
-            <div class="header-left-texts">
-                <h1><i class="ph-fill ph-chart-line-up"></i> Panel de Monitoreo</h1>
-                <p>MUNICIPALIDAD METROPOLITANA DE LIMA</p>
-            </div>
+            <h1><i class="ph-fill ph-chart-line-up"></i> Panel de Monitoreo</h1>
+            <p>MUNICIPALIDAD METROPOLITANA DE LIMA</p>
         </div>
         <div class="nav-buttons">
             <button class="nav-btn active" onclick="switchView('general')"><i class="ph ph-squares-four"></i> General</button>
             <button class="nav-btn" onclick="switchView('semaforo')"><i class="ph ph-traffic-signal"></i> Semáforo</button>
             <button class="nav-btn" onclick="switchView('ahorro')"><i class="ph ph-piggy-bank"></i> Ahorro</button>
         </div>
+        
         <div class="filters">
             <label for="month-select" style="color: var(--text-muted);"><i class="ph ph-calendar-blank"></i> Mes:</label>
-            <select id="month-select" onchange="applyFilter()">
+            <select id="month-select">
                 <option value="0">Enero</option>
                 <option value="1">Febrero</option>
                 <option value="2">Marzo</option>
@@ -199,6 +242,7 @@
                 <option value="10">Noviembre</option>
                 <option value="11">Diciembre</option>
             </select>
+            <button class="btn-apply" onclick="applyFilter()"><i class="ph ph-funnel"></i> Filtrar</button>
         </div>
     </header>
 
@@ -211,6 +255,7 @@
                 <div id="kpi-trend" class="trend-badge flat">--</div>
             </div>
         </div>
+
         <div class="chart-card box-time">
             <h3><i class="ph ph-trend-up"></i> Menciones en el tiempo</h3>
             <div class="chart-container"><canvas id="c-time"></canvas></div>
@@ -219,6 +264,7 @@
             <h3><i class="ph ph-pie-chart"></i> Tipo de Medio (%)</h3>
             <div class="chart-container"><canvas id="c-medio"></canvas></div>
         </div>
+        
         <div class="chart-card box-prot">
             <h3><i class="ph ph-users"></i> Top Protagonistas</h3>
             <div class="chart-container"><canvas id="c-prot"></canvas></div>
@@ -287,7 +333,7 @@
         const colors = { main: '#002f80', pos: '#10b981', neu: '#f59e0b', neg: '#ef4444', mainLight: '#2563eb', sky: '#60a5fa' };
         const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
         let rawData = [], filteredData = [], prevData = [], charts = {};
-
+        
         Papa.parse(CSV_URL, {
             download: true, header: true,
             complete: function(results) {
@@ -308,15 +354,21 @@
 
         function parseCurrency(val) {
             if(!val) return 0;
-            let str = val.toString().trim().replace(/[^0-9.,-]/g, '');
+            let str = val.toString().trim();
+            str = str.replace(/[^0-9.,-]/g, '');
             if(str === '') return 0;
-            const lastComma = str.lastIndexOf(','), lastDot = str.lastIndexOf('.');
+            const lastComma = str.lastIndexOf(',');
+            const lastDot = str.lastIndexOf('.');
             if (lastComma > lastDot) str = str.replace(/\./g, '').replace(',', '.');
             else str = str.replace(/,/g, '');
-            const num = parseFloat(str); return isNaN(num) ? 0 : num;
+            const num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
         }
 
-        function setDefaultMonth() { document.getElementById('month-select').value = new Date().getMonth(); }
+        function setDefaultMonth() {
+            const today = new Date();
+            document.getElementById('month-select').value = today.getMonth();
+        }
 
         function switchView(viewId) {
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -326,191 +378,220 @@
         }
 
         function applyFilter() {
-            const m = parseInt(document.getElementById('month-select').value);
-            const y = new Date().getFullYear();
-            const start = new Date(y, m, 1), end = new Date(y, m + 1, 0, 23, 59, 59);
-            const prevStart = new Date(y, m - 1, 1), prevEnd = new Date(y, m, 0, 23, 59, 59);
-
-            filteredData = rawData.filter(r => {
-                const f = getCol(r, 'FECHA'); if(!f) return false;
-                const p = f.split('/'); if(p.length !== 3) return false;
-                const d = new Date(p[2], p[1]-1, p[0]); return d >= start && d <= end;
+            const selectedMonth = parseInt(document.getElementById('month-select').value);
+            const currentYear = new Date().getFullYear();
+            
+            const start = new Date(currentYear, selectedMonth, 1);
+            const end = new Date(currentYear, selectedMonth + 1, 0, 23, 59, 59);
+            const prevStart = new Date(currentYear, selectedMonth - 1, 1);
+            const prevEnd = new Date(currentYear, selectedMonth, 0, 23, 59, 59);
+            
+            filteredData = rawData.filter(row => {
+                const f = getCol(row, 'FECHA');
+                if(!f) return false;
+                const p = f.split('/');
+                if(p.length !== 3) return false;
+                const d = new Date(p[2], p[1]-1, p[0]);
+                return d >= start && d <= end;
             });
-            prevData = rawData.filter(r => {
-                const f = getCol(r, 'FECHA'); if(!f) return false;
-                const p = f.split('/'); if(p.length !== 3) return false;
-                const d = new Date(p[2], p[1]-1, p[0]); return d >= prevStart && d <= prevEnd;
+            
+            prevData = rawData.filter(row => {
+                const f = getCol(row, 'FECHA');
+                if(!f) return false;
+                const p = f.split('/');
+                if(p.length !== 3) return false;
+                const d = new Date(p[2], p[1]-1, p[0]);
+                return d >= prevStart && d <= prevEnd;
             });
-
+            
             renderAll();
         }
 
         function renderAll() {
-            Object.values(charts).forEach(c => c.destroy()); charts = {};
+            Object.values(charts).forEach(c => c.destroy());
+            charts = {};
             
-            const currCount = filteredData.length, prevCount = prevData.length;
+            const currCount = filteredData.length;
+            const prevCount = prevData.length;
             document.getElementById('total-menciones').innerText = currCount.toLocaleString('es-PE');
             
             const trendEl = document.getElementById('kpi-trend');
             if(prevCount === 0) {
-                trendEl.innerHTML = '<i class="ph ph-minus"></i> 0% vs mes ant.'; trendEl.className = 'trend-badge flat';
+                trendEl.innerHTML = '<i class="ph ph-minus"></i> 0% vs mes ant.';
+                trendEl.className = 'trend-badge flat';
             } else {
                 const diff = ((currCount - prevCount) / prevCount) * 100;
-                if(diff > 0) { trendEl.innerHTML = `<i class="ph-bold ph-trend-up"></i> ${diff.toFixed(1)}% vs mes ant.`; trendEl.className = 'trend-badge up'; }
-                else if(diff < 0) { trendEl.innerHTML = `<i class="ph-bold ph-trend-down"></i> ${Math.abs(diff).toFixed(1)}% vs mes ant.`; trendEl.className = 'trend-badge down'; }
-                else { trendEl.innerHTML = `<i class="ph ph-minus"></i> 0% vs mes ant.`; trendEl.className = 'trend-badge flat'; }
+                if(diff > 0) {
+                    trendEl.innerHTML = `<i class="ph-bold ph-trend-up"></i> ${diff.toFixed(1)}% vs mes ant.`;
+                    trendEl.className = 'trend-badge up';
+                } else if(diff < 0) {
+                    trendEl.innerHTML = `<i class="ph-bold ph-trend-down"></i> ${Math.abs(diff).toFixed(1)}% vs mes ant.`;
+                    trendEl.className = 'trend-badge down';
+                } else {
+                    trendEl.innerHTML = `<i class="ph ph-minus"></i> 0% vs mes ant.`;
+                    trendEl.className = 'trend-badge flat';
+                }
             }
-            renderPagina1(); renderPagina2(); renderPagina3();
+
+            renderPagina1();
+            renderPagina2();
+            renderPagina3();
         }
 
         function formatFriendlyDate(dateStr) {
-            if(!dateStr) return ''; const p = dateStr.split('/');
-            return p.length === 3 ? `${parseInt(p[0], 10)} ${monthNames[parseInt(p[1], 10)-1]}` : dateStr;
+            if(!dateStr) return '';
+            const p = dateStr.split('/');
+            if(p.length !== 3) return dateStr;
+            return `${parseInt(p[0], 10)} ${monthNames[parseInt(p[1], 10)-1]}`;
         }
 
-        // --- SISTEMA INTELIGENTE DE CORTES DE ETIQUETAS PARA MÓVIL ---
-        const isMobile = () => window.innerWidth <= 860;
-        const dynamicRightPadding = () => isMobile() ? 90 : 70; // Más espacio a la derecha en móvil para los porcentajes
-
-        const scaleAxesConfig = {
-            ticks: { 
-                font: { size: isMobile() ? 11 : 12, weight: '500' }, color: '#64748b',
-                callback: function(val) {
-                    let label = this.getLabelForValue(val);
-                    if (typeof label !== 'string') return label;
-                    
-                    const maxLen = isMobile() ? 16 : 30; // En móvil cortamos antes
-                    
-                    if (label.length > maxLen) {
-                        const words = label.split(' ');
-                        let lines = []; let currentLine = '';
-                        
-                        for (let word of words) {
-                            if ((currentLine + word).length > maxLen) {
-                                if (currentLine) lines.push(currentLine.trim());
-                                currentLine = word + ' ';
-                            } else { currentLine += word + ' '; }
-                        }
-                        if (currentLine) lines.push(currentLine.trim());
-                        
-                        // Si hay demasiadas líneas en móvil, truncamos para que no tape todo
-                        if (isMobile() && lines.length > 2) {
-                            return [lines[0], lines[1].substring(0, maxLen - 3) + '...'];
-                        }
-                        return lines;
-                    }
-                    return label;
-                }
-            } 
-        };
-
-        // --- SOLUCIÓN DE PORCENTAJES BASADOS EN EL TOTAL DE MENCIONES ---
         const datalabelsConfig = {
-            color: varCol => varCol || colors.main, font: { weight: '700', size: 12 }, anchor: 'end', align: 'end',
-            formatter: (val, ctx) => { 
-                if(!val) return ''; 
-                const total = filteredData.length; 
-                return total > 0 ? `${val} (${(val*100/total).toFixed(1)}%)` : `${val} (0%)`; 
+            color: varCol => varCol || colors.main, font: { weight: '700', size: 12 },
+            anchor: 'end', align: 'end',
+            formatter: (val, ctx) => {
+                if(!val) return '';
+                const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                return `${val} (${(val*100/sum).toFixed(1)}%)`;
             }
         };
-
+        const pieLabelsConfig = {
+            color: '#fff', font: { weight: 'bold', size: 13 },
+            textShadowBlur: 4, textShadowColor: 'rgba(0,0,0,0.4)',
+            formatter: (val, ctx) => {
+                const sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                return `${val}\n(${(val*100/sum).toFixed(1)}%)`;
+            }
+        };
+        
+        const scaleAxesConfig = {
+            ticks: { font: { size: 12, weight: '500' }, color: '#64748b' } 
+        };
+        
         const tooltipConfig = {
             enabled: true, titleFont: { size: 14, family:'Inter' }, bodyFont: { size: 13, family:'Inter' }, padding: 12,
             backgroundColor: 'rgba(15, 23, 42, 0.9)', cornerRadius: 8
         };
-
+        
         function groupData(colName) {
-            const res = {}; filteredData.forEach(r => { const v = getCol(r, colName); if(v) res[v] = (res[v]||0)+1; });
+            const res = {};
+            filteredData.forEach(r => { const v = getCol(r, colName); if(v) res[v] = (res[v]||0)+1; });
             return Object.entries(res).sort((a,b) => b[1]-a[1]);
         }
+
         function determineSentiment(val) {
-            if(!val) return 'Neutro'; const v = val.toUpperCase();
-            if(v.includes('POS')) return 'Positiva'; if(v.includes('NEG')) return 'Negativa'; return 'Neutro';
+            if(!val) return 'Neutro';
+            const v = val.toUpperCase();
+            if(v.includes('POS')) return 'Positiva';
+            if(v.includes('NEG')) return 'Negativa';
+            return 'Neutro';
         }
 
         // ==========================================
-        // PÁGINA 1
+        // PÁGINA 1: GENERAL
         // ==========================================
         function renderPagina1() {
-            const timeObj = {}; filteredData.forEach(r => { const f = getCol(r, 'FECHA'); if(f) timeObj[f] = (timeObj[f]||0)+1; });
+            const timeObj = {};
+            filteredData.forEach(r => { const f = getCol(r, 'FECHA'); if(f) timeObj[f] = (timeObj[f]||0)+1; });
             const timeKeys = Object.keys(timeObj).sort((a,b) => { const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]); });
             
+            // Creación del degradado para la gráfica de línea
             const ctxTime = document.getElementById('c-time').getContext('2d');
             const gradientTime = ctxTime.createLinearGradient(0, 0, 0, 300);
-            gradientTime.addColorStop(0, colors.mainLight + '60'); gradientTime.addColorStop(1, colors.mainLight + '00');
-
+            gradientTime.addColorStop(0, colors.mainLight + '60'); 
+            gradientTime.addColorStop(1, colors.mainLight + '00');
+            
             charts.p1Time = new Chart(document.getElementById('c-time'), {
                 type: 'line',
-                data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: gradientTime, fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#fff', pointBorderColor: colors.main }] },
-                options: { layout: { padding: { top: 20 } }, interaction: { mode: 'index', intersect: false }, responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '700', size: 12 } } }, scales: { y: { beginAtZero: true, grace: '15%', grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } }
+                data: { labels: timeKeys.map(formatFriendlyDate), datasets: [{ label: 'Menciones', data: timeKeys.map(l=>timeObj[l]), borderColor: colors.mainLight, backgroundColor: gradientTime, fill:true, tension:0.4, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: colors.main, pointBorderWidth: 2 }] },
+                options: { 
+                    layout: { padding: { top: 30 } },
+                    interaction: { mode: 'index', intersect: false }, 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels:{ display: true, align: 'top', anchor: 'center', offset: 6, color: colors.main, font: { weight: '700', size: 12 } } }, 
+                    scales: { y: { beginAtZero: true, grace: '20%', grid: { borderDash: [4, 4], color: '#f1f5f9' }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                }
             });
-
+            
             const med = groupData('TIPO DE MEDIO');
             charts.p1Medio = new Chart(document.getElementById('c-medio'), {
                 type: 'doughnut',
                 data: { labels: med.map(x=>x[0]), datasets: [{ data: med.map(x=>x[1]), backgroundColor: [colors.main, colors.mainLight, '#60a5fa', '#93c5fd', '#bfdbfe'], borderWidth: 2, borderColor: '#fff' }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '45%', plugins: { tooltip: tooltipConfig, legend:{position: isMobile() ? 'bottom' : 'right', labels:{boxWidth:12, usePointStyle:true, font:{size:11, family:'Inter'}}}, datalabels: {color:'#fff', font:{weight:'bold', size:12}, formatter:(val,ctx)=>{const total = filteredData.length; return total > 0 ? `${val}\n(${(val*100/total).toFixed(1)}%)` : `${val}\n(0%)`;}} } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '45%', layout: { padding: 20 }, plugins: { tooltip: tooltipConfig, legend:{position:'right', labels:{boxWidth:12, usePointStyle:true, font:{size:12, family:'Inter'}}}, datalabels: pieLabelsConfig } }
             });
 
             const prot = groupData('QUIÉN').slice(0, 10);
             charts.p1Prot = new Chart(document.getElementById('c-prot'), {
                 type: 'bar',
                 data: { labels: prot.map(x=>x[0]), datasets: [{ data: prot.map(x=>x[1]), backgroundColor: colors.sky, borderRadius: 6 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.sky} }, layout:{padding:{right: dynamicRightPadding()}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.sky} }, layout:{padding:{right:120}}, scales: { x:{display:false, grace: '30%'}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
 
             const temat = groupData('TEMA').slice(0, 10);
             charts.p1Temat = new Chart(document.getElementById('c-temat'), {
                 type: 'bar',
                 data: { labels: temat.map(x=>x[0]), datasets: [{ data: temat.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 6 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.mainLight} }, layout:{padding:{right: dynamicRightPadding()}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.mainLight} }, layout:{padding:{right:120}}, scales: { x:{display:false, grace: '30%'}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
 
             const orig = groupData('ORIGEN').slice(0, 10);
             charts.p1Orig = new Chart(document.getElementById('c-orig'), {
                 type: 'bar',
                 data: { labels: orig.map(x=>x[0]), datasets: [{ data: orig.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 6 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, layout:{padding:{right: dynamicRightPadding()}}, scales: { x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig} } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, legend:{display:false}, datalabels: {...datalabelsConfig, color: colors.main} }, layout:{padding:{right:120}}, scales: { x:{display:false, grace: '30%'}, y:{grid:{display:false}, ...scaleAxesConfig} } }
             });
         }
 
         // ==========================================
-        // PÁGINA 2
+        // PÁGINA 2: SEMÁFORO
         // ==========================================
         function renderPagina2() {
-            const sentCount = { 'Positiva':0, 'Neutro':0, 'Negativa':0 }; const timeSem = { 'Positiva':{}, 'Neutro':{}, 'Negativa':{} }; const medNeg = {};
+            const sentCount = { 'Positiva':0, 'Neutro':0, 'Negativa':0 };
+            const timeSem = { 'Positiva':{}, 'Neutro':{}, 'Negativa':{} };
+            const medNeg = {};
+            
             filteredData.forEach(r => {
-                const s = determineSentiment(getCol(r, 'CRITERIO')); sentCount[s]++;
-                const f = getCol(r, 'FECHA'); if(f) timeSem[s][f] = (timeSem[s][f]||0)+1;
-                if(s === 'Negativa') { const nm = getCol(r, 'NOMBRE DEL MEDIO') || 'Desconocido'; medNeg[nm] = (medNeg[nm]||0)+1; }
+                const s = determineSentiment(getCol(r, 'CRITERIO'));
+                sentCount[s]++;
+                const f = getCol(r, 'FECHA');
+                if(f) timeSem[s][f] = (timeSem[s][f]||0)+1;
+
+                if(s === 'Negativa') {
+                    const nm = getCol(r, 'NOMBRE DEL MEDIO') || 'Desconocido';
+                    medNeg[nm] = (medNeg[nm]||0)+1;
+                }
             });
-
+            
             const allDates = [...new Set(filteredData.map(r=>getCol(r,'FECHA')).filter(Boolean))].sort((a,b)=>{const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]);});
-
+            
             charts.p2Time = new Chart(document.getElementById('c-time-sem'), {
                 type: 'line',
                 data: {
                     labels: allDates.map(formatFriendlyDate),
                     datasets: [
-                        { label: 'Positivo', data: allDates.map(d=>timeSem['Positiva'][d]||0), borderColor: colors.pos, backgroundColor: colors.pos, tension: 0.4, borderWidth: 3, pointRadius: 3 },
-                        { label: 'Negativo', data: allDates.map(d=>timeSem['Negativa'][d]||0), borderColor: colors.neg, backgroundColor: colors.neg, tension: 0.4, borderWidth: 3, pointRadius: 3 },
-                        { label: 'Neutro', data: allDates.map(d=>timeSem['Neutro'][d]||0), borderColor: colors.neu, backgroundColor: colors.neu, tension: 0.4, borderWidth: 3, pointRadius: 3 }
+                        { label: 'Positivo', data: allDates.map(d=>timeSem['Positiva'][d]||0), borderColor: colors.pos, backgroundColor: colors.pos, tension: 0.4, borderWidth: 3, pointRadius: 3, pointHoverRadius: 6 },
+                        { label: 'Negativo', data: allDates.map(d=>timeSem['Negativa'][d]||0), borderColor: colors.neg, backgroundColor: colors.neg, tension: 0.4, borderWidth: 3, pointRadius: 3, pointHoverRadius: 6 },
+                        { label: 'Neutro', data: allDates.map(d=>timeSem['Neutro'][d]||0), borderColor: colors.neu, backgroundColor: colors.neu, tension: 0.4, borderWidth: 3, pointRadius: 3, pointHoverRadius: 6 }
                     ]
                 },
-                options: { interaction: { mode: 'index', intersect: false }, responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:12}}} }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4] }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } }
+                options: { 
+                    interaction: { mode: 'index', intersect: false }, 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { tooltip: tooltipConfig, datalabels:{display:false}, legend:{labels:{usePointStyle:true, boxWidth:8, font:{size:12, family:'Inter'}}} }, 
+                    scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, ...scaleAxesConfig }, x: { grid: { display: false }, ...scaleAxesConfig } } 
+                }
             });
-
+            
             charts.p2Pie = new Chart(document.getElementById('c-pie-sem'), {
                 type: 'pie',
                 data: { labels: ['Positivo', 'Neutro', 'Negativo'], datasets: [{ data: [sentCount['Positiva'], sentCount['Neutro'], sentCount['Negativa']], backgroundColor: [colors.pos, colors.neu, colors.neg], borderWidth: 2, borderColor: '#fff' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: tooltipConfig, datalabels: {color:'#fff', font:{weight:'bold', size:12}, formatter:(val,ctx)=>{const total = filteredData.length; return total > 0 ? `${val}\n(${(val*100/total).toFixed(1)}%)` : `${val}\n(0%)`;}}, legend:{position:'bottom', labels:{usePointStyle:true, font:{size:12}}} } }
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 20 }, plugins: { tooltip: tooltipConfig, datalabels: pieLabelsConfig, legend:{position:'bottom', labels:{usePointStyle:true, font:{size:12, family:'Inter'}}} } }
             });
 
             const topNeg = Object.entries(medNeg).sort((a,b)=>b[1]-a[1]).slice(0,5);
             charts.p2Top = new Chart(document.getElementById('c-top-neg'), {
                 type: 'bar',
                 data: { labels: topNeg.map(x=>x[0]), datasets: [{ data: topNeg.map(x=>x[1]), backgroundColor: colors.neg, borderRadius: 6 }] },
-                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'700', size:12}, formatter: (val) => { const total = filteredData.length; return total > 0 ? `${val} (${(val*100/total).toFixed(1)}%)` : `${val}`; }}}, layout:{padding:{right: dynamicRightPadding()}}, scales:{x:{display:false}, y:{grid:{display:false}, ...scaleAxesConfig}} }
+                options: { indexAxis:'y', responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels:{anchor:'end',align:'end',color:colors.neg,font:{weight:'700', size:12}}}, scales:{x:{display:false, grace: '30%'}, y:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{right:120}} }
             });
 
             function buildStack(colName) {
@@ -521,55 +602,69 @@
                     p.push(rows.filter(r=>determineSentiment(getCol(r,'CRITERIO'))==='Positiva').length);
                     nu.push(rows.filter(r=>determineSentiment(getCol(r,'CRITERIO'))==='Neutro').length);
                     ne.push(rows.filter(r=>determineSentiment(getCol(r,'CRITERIO'))==='Negativa').length);
-                }); return { labels:cats, p, nu, ne };
+                });
+                return { labels:cats, p, nu, ne };
             }
 
-            const stackConf = { color: '#fff', font: { weight: 'bold', size: 11 }, display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0 };
-            const stackConfNeu = { ...stackConf, color: '#000' };
+            const stackLabelConf = { color: '#fff', font: { weight: 'bold', size: 12 }, display: function(ctx) { return ctx.dataset.data[ctx.dataIndex] > 0; } };
+            const stackLabelConfNeu = { ...stackLabelConf, color: '#000' };
 
             const stProt = buildStack('QUIÉN');
             charts.p2Prot = new Chart(document.getElementById('c-prot-sem'), {
                 type: 'bar',
-                data: { labels: stProt.labels, datasets: [ {label:'Positivo', data:stProt.p, backgroundColor:colors.pos, datalabels: stackConf}, {label:'Neutro', data:stProt.nu, backgroundColor:colors.neu, datalabels: stackConfNeu}, {label:'Negativo', data:stProt.ne, backgroundColor:colors.neg, datalabels: stackConf} ]},
-                options: { interaction: { mode: 'index', intersect: false }, indexAxis:'y', responsive: true, maintainAspectRatio: false, layout:{padding:{right: isMobile() ? 20 : 10}}, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{ tooltip: tooltipConfig, legend:{display:false}} }
+                data: { labels: stProt.labels, datasets: [ {label:'Positivo', data:stProt.p, backgroundColor:colors.pos, datalabels: stackLabelConf}, {label:'Neutro', data:stProt.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu}, {label:'Negativo', data:stProt.ne, backgroundColor:colors.neg, datalabels: stackLabelConf} ]},
+                options: { interaction: { mode: 'index', intersect: false }, indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{ tooltip: tooltipConfig, legend:{display:false}} }
             });
 
             const stMed = buildStack('TIPO DE MEDIO');
             charts.p2Med = new Chart(document.getElementById('c-med-sem'), {
                 type: 'bar',
-                data: { labels: stMed.labels, datasets: [ {label:'Positivo', data:stMed.p, backgroundColor:colors.pos, datalabels: stackConf}, {label:'Neutro', data:stMed.nu, backgroundColor:colors.neu, datalabels: stackConfNeu}, {label:'Negativo', data:stMed.ne, backgroundColor:colors.neg, datalabels: stackConf} ]},
-                options: { interaction: { mode: 'index', intersect: false }, indexAxis:'y', responsive: true, maintainAspectRatio: false, layout:{padding:{right: isMobile() ? 20 : 10}}, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{ tooltip: tooltipConfig, legend:{display:false}} }
+                data: { labels: stMed.labels, datasets: [ {label:'Positivo', data:stMed.p, backgroundColor:colors.pos, datalabels: stackLabelConf}, {label:'Neutro', data:stMed.nu, backgroundColor:colors.neu, datalabels: stackLabelConfNeu}, {label:'Negativo', data:stMed.ne, backgroundColor:colors.neg, datalabels: stackLabelConf} ]},
+                options: { interaction: { mode: 'index', intersect: false }, indexAxis:'y', responsive: true, maintainAspectRatio: false, scales:{x:{stacked:true, display:false},y:{stacked:true, grid:{display:false}, ...scaleAxesConfig}}, plugins:{ tooltip: tooltipConfig, legend:{display:false}} }
             });
         }
 
         // ==========================================
-        // PÁGINA 3
+        // PÁGINA 3: AHORRO 
         // ==========================================
         function renderPagina3() {
-            let totalS = 0; const ahMed = {}, ahProt = {};
+            let totalS = 0;
+            const ahMed = {}, ahProt = {};
+
             filteredData.forEach(r => {
                 if(determineSentiment(getCol(r, 'CRITERIO')) === 'Positiva') {
-                    const sVal = parseCurrency(getCol(r, 'SOLES'));
-                    if(sVal > 0) { totalS += sVal; ahMed[getCol(r, 'TIPO DE MEDIO')||'Otros'] = (ahMed[getCol(r, 'TIPO DE MEDIO')||'Otros']||0) + sVal; ahProt[getCol(r, 'QUIÉN')||'Otros'] = (ahProt[getCol(r, 'QUIÉN')||'Otros']||0) + sVal; }
+                    const rawVal = getCol(r, 'SOLES');
+                    const sVal = parseCurrency(rawVal);
+                    if(sVal > 0) {
+                        totalS += sVal;
+                        const tm = getCol(r, 'TIPO DE MEDIO') || 'Otros';
+                        const tp = getCol(r, 'QUIÉN') || 'Otros';
+                        ahMed[tm] = (ahMed[tm]||0) + sVal;
+                        ahProt[tp] = (ahProt[tp]||0) + sVal;
+                    }
                 }
             });
+            
             document.getElementById('total-soles').innerText = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(totalS);
-
-            const moneyConf = { color: colors.main, anchor: 'end', align: 'end', font: {weight:'700', size: 12}, formatter: (val) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', maximumFractionDigits:0 }).format(val) };
-
+            
+            const moneyLabelConf = {
+                color: colors.main, anchor: 'end', align: 'end', font: {weight:'700', size: 12},
+                formatter: (val) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN', maximumFractionDigits:0 }).format(val)
+            };
+            
             const sortAhMed = Object.entries(ahMed).sort((a,b)=>b[1]-a[1]);
             charts.p3Med = new Chart(document.getElementById('c-ahorro-med'), {
                 type: 'bar',
                 data: { labels: sortAhMed.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhMed.map(x=>x[1]), backgroundColor: colors.main, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: moneyConf}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
+                options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: moneyLabelConf}, scales: {y:{display:false, grace: '20%', ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:40}} }
             });
 
             const sortAhProt = Object.entries(ahProt).sort((a,b)=>b[1]-a[1]);
             charts.p3Prot = new Chart(document.getElementById('c-ahorro-prot'), {
                 type: 'bar',
                 data: { labels: sortAhProt.map(x=>x[0]), datasets: [{ label: 'Ahorro', data: sortAhProt.map(x=>x[1]), backgroundColor: colors.mainLight, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: {...moneyConf, color: colors.mainLight}}, scales: {y:{display:false, ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:30}} }
-             });
+                options: { responsive: true, maintainAspectRatio: false, plugins:{ tooltip: tooltipConfig, legend:{display:false}, datalabels: {...moneyLabelConf, color: colors.mainLight}}, scales: {y:{display:false, grace: '20%', ...scaleAxesConfig}, x:{grid:{display:false}, ...scaleAxesConfig}}, layout:{padding:{top:40}} }
+            });
         }
     </script>
 </body>
