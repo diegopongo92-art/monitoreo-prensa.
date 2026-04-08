@@ -55,7 +55,7 @@
             box-shadow: var(--shadow-sm);
         }
         
-        /* ESTILOS NUEVOS PARA EL LOGO Y TEXTOS */
+        /* ESTILOS DEL LOGO Y TEXTOS */
         .header-left { display: flex; align-items: center; gap: 14px; }
         .logo-mml { height: 42px; width: auto; object-fit: contain; }
         .header-left-texts { display: flex; flex-direction: column; }
@@ -91,17 +91,6 @@
             transition: border-color 0.2s;
         }
         select:focus { border-color: var(--primary-light); }
-        
-        .btn-apply { 
-            background: var(--primary);
-            color: white; border: none; padding: 8px 16px; 
-            border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: var(--shadow-sm); font-size: 13px;
-            display: flex;
-            align-items: center; gap: 6px;
-            transition: background 0.2s, transform 0.1s; 
-        }
-        .btn-apply:hover { background: var(--primary-light);
-        transform: translateY(-1px); }
 
         /* VISTAS Y GRIDS */
         .dashboard-view { 
@@ -244,7 +233,7 @@
         
         <div class="filters">
             <label for="month-select" style="color: var(--text-muted);"><i class="ph ph-calendar-blank"></i> Mes:</label>
-            <select id="month-select">
+            <select id="month-select" onchange="applyFilter()">
                 <option value="0">Enero</option>
                 <option value="1">Febrero</option>
                 <option value="2">Marzo</option>
@@ -258,7 +247,6 @@
                 <option value="10">Noviembre</option>
                 <option value="11">Diciembre</option>
             </select>
-            <button class="btn-apply" onclick="applyFilter()"><i class="ph ph-funnel"></i> Filtrar</button>
         </div>
     </header>
 
