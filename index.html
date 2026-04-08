@@ -136,7 +136,7 @@
             position: relative; display: flex; flex-direction: column;
             box-shadow: var(--shadow-md);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            min-height: 0;
+            min-height: 0; /* Por defecto en PC para que el grid controle la altura */
         }
         .chart-card:hover { 
             box-shadow: var(--shadow-hover);
@@ -206,6 +206,86 @@
             border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========================================= */
+        /* ADAPTACIÓN PARA MÓVILES Y PANTALLAS CHICAS */
+        /* ========================================= */
+        @media (max-width: 860px) {
+            body {
+                height: auto;
+                overflow-y: auto; /* Permitir scroll vertical en móvil */
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+                height: auto;
+            }
+
+            .header-left {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-left-texts h1 {
+                justify-content: center;
+                font-size: 17px;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 100px; /* Para que no se aplasten demasiado */
+            }
+
+            .filters {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .filters select {
+                flex: 1;
+                max-width: 250px;
+            }
+
+            .dashboard-view {
+                height: auto;
+                overflow: visible;
+            }
+            
+            /* Cambiamos el Grid por una columna vertical simple */
+            .dashboard-view.active {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            /* Asegurar altura a las gráficas en móvil para que no desaparezcan */
+            .chart-card {
+                min-height: 320px; 
+            }
+            
+            /* Ajustes para la vista de Ahorro en móvil */
+            .box-bars-a {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .kpi-box {
+                padding: 30px 20px; /* Un poco más de espacio en el KPI principal */
+            }
+            
+            .kpi-box h2 {
+                font-size: 38px;
+            }
+        }
     </style>
 </head>
 <body>
