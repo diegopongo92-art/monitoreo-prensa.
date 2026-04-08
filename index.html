@@ -214,6 +214,7 @@
             body {
                 height: auto;
                 overflow-y: auto; /* Permitir scroll vertical en móvil */
+                padding: 10px; /* Margen un poco más ajustado para móvil */
             }
             
             header {
@@ -242,7 +243,7 @@
             .nav-btn {
                 flex: 1;
                 justify-content: center;
-                min-width: 100px; /* Para que no se aplasten demasiado */
+                min-width: 100px;
             }
 
             .filters {
@@ -260,26 +261,56 @@
                 overflow: visible;
             }
             
-            /* Cambiamos el Grid por una columna vertical simple */
+            /* Cambiamos el Grid por una columna vertical simple con espaciado */
             .dashboard-view.active {
                 display: flex;
                 flex-direction: column;
-                gap: 16px;
+                gap: 20px;
             }
             
-            /* Asegurar altura a las gráficas en móvil para que no desaparezcan */
+            /* Hacemos que la tarjeta crezca según el contenido que le dictemos abajo */
             .chart-card {
-                min-height: 320px; 
+                height: auto; 
+            }
+
+            /* --- ALTURAS ESPECÍFICAS SEGÚN EL TIPO DE GRÁFICO PARA QUE NO SE APLASTEN --- */
+            
+            /* 1. Gráficos de barras horizontales (Necesitan MUCHO espacio vertical para las etiquetas) */
+            .box-prot .chart-container,
+            .box-temat .chart-container,
+            .box-orig .chart-container,
+            .box-top-neg .chart-container,
+            .box-prot-s .chart-container,
+            .box-med-s .chart-container {
+                min-height: 400px; 
+            }
+
+            /* 2. Gráficos circulares (Doughnut / Pie) */
+            .box-pie .chart-container,
+            .box-pie-s .chart-container {
+                min-height: 320px;
             }
             
-            /* Ajustes para la vista de Ahorro en móvil */
+            /* 3. Gráficos de líneas (Tiempo) */
+            .box-time .chart-container,
+            .box-time-s .chart-container {
+                min-height: 280px;
+            }
+
+            /* 4. Gráficos de Ahorro (Barras verticales) */
+            #view-ahorro .chart-card .chart-container {
+                min-height: 350px;
+            }
+            
+            /* Ajustes para los KPI en móvil */
             .box-bars-a {
                 display: flex;
                 flex-direction: column;
+                gap: 20px;
             }
             
             .kpi-box {
-                padding: 30px 20px; /* Un poco más de espacio en el KPI principal */
+                padding: 30px 20px;
             }
             
             .kpi-box h2 {
@@ -579,7 +610,6 @@
             filteredData.forEach(r => { const f = getCol(r, 'FECHA'); if(f) timeObj[f] = (timeObj[f]||0)+1; });
             const timeKeys = Object.keys(timeObj).sort((a,b) => { const x=a.split('/'); const y=b.split('/'); return new Date(x[2],x[1]-1,x[0]) - new Date(y[2],y[1]-1,y[0]); });
             
-            // Creación del degradado para la gráfica de línea
             const ctxTime = document.getElementById('c-time').getContext('2d');
             const gradientTime = ctxTime.createLinearGradient(0, 0, 0, 300);
             gradientTime.addColorStop(0, colors.mainLight + '60'); 
